@@ -1,124 +1,55 @@
-# Bataille de Philadelphie - Révolution Américaine 1776
+# Jeu de Tir Top-Down en Pygame
 
-Jeu de plateforme 2D développé en Python avec Pygame.
-
-## Description
-
-Incarnez un soldat américain pendant la Révolution Américaine et affrontez les soldats britanniques dans les rues de Philadelphie. Progressez à travers 5 niveaux avec une difficulté croissante et des ennemis variés.
+Un jeu de tir vu du dessus où vous contrôlez un soldat américain dans des salles remplies d'ennemis.
 
 ## Fonctionnalités
 
-- **5 niveaux** avec difficulté progressive
-- **5 types d'ennemis** britanniques avec apparences et statistiques uniques :
-  - Regular (2 PV)
-  - Elite (3 PV)
-  - Officer (4 PV)
-  - Commander (6 PV)
-  - Tank (8 PV)
-- **3 skins** pour le joueur (soldat, général, minuteman)
-- **Power-ups** : cadence de tir, santé, vitesse
-- **Système de vie** à 4 cœurs
-- **Sons synthétiques** générés dynamiquement
-- **Génération procédurale** des niveaux
-- **Défilement de caméra** fluide
-
-## Structure du Projet
-
-```
-pygame-prj/
-├── main_new.py          # Point d'entrée du jeu
-├── config/              # Configuration
-│   ├── __init__.py
-│   └── settings.py      # Constantes et paramètres
-├── managers/            # Gestionnaires
-│   ├── __init__.py
-│   ├── camera.py        # Gestion de la caméra
-│   └── sound_manager.py # Gestion des sons
-├── entities/            # Entités du jeu
-│   ├── __init__.py
-│   ├── player.py        # Joueur
-│   ├── enemy.py         # Ennemis
-│   ├── bullet.py        # Projectiles
-│   ├── platform.py      # Plateformes
-│   ├── building.py      # Bâtiments (décor)
-│   └── powerup.py       # Power-ups
-└── game/                # Logique principale
-    ├── __init__.py
-    └── game.py          # Classe Game principale
-```
-
-## Architecture
-
-Le projet suit les principes de **programmation orientée objet** :
-
-- **Séparation des responsabilités** : Chaque classe a un rôle unique
-- **Une classe par fichier** : Meilleure lisibilité et maintenabilité
-- **Modules logiques** : Organisation par fonctionnalité
-- **Pattern Manager** : SoundManager, Camera pour centraliser les comportements
-- **Sprites Pygame** : Utilisation du système de sprites pour les entités
+- **Contrôle du joueur** : Déplacement avec WASD ou les flèches directionnelles
+- **Visée à la souris** : Le personnage se tourne automatiquement vers le curseur
+- **Système de tir** : Clic gauche pour tirer dans la direction de la souris
+- **IA des ennemis** : Les ennemis détectent et attaquent le joueur
+- **Système de collision** : Murs et obstacles dans les salles
+- **Système de santé** : Interface affichant la santé et le nombre d'ennemis
+- **Conditions de victoire/défaite** : Éliminez tous les ennemis pour gagner
 
 ## Installation
 
-### Prérequis
-
-- Python 3.7+
-- Pygame
-
-### Installation
+1. Assurez-vous d'avoir Python 3.7+ installé
+2. Installez les dépendances :
 
 ```bash
-# Cloner le projet
-cd pygame-prj
-
-# Créer un environnement virtuel (recommandé)
-python -m venv .venv
-.venv\Scripts\activate  # Windows
-source .venv/bin/activate  # Linux/Mac
-
-# Installer les dépendances
-pip install pygame
+pip install -r requirements.txt
 ```
 
-## Utilisation
+## Lancement du jeu
 
 ```bash
-python main_new.py
+python main.py
 ```
 
 ## Contrôles
 
-- **Flèches directionnelles / Q, D** : Se déplacer
-- **Espace** : Sauter
-- **C** : Changer de skin
-- **ESC** : Pause / Menu
-- **Tir automatique** : Le joueur tire continuellement
+- **WASD** ou **Flèches directionnelles** : Déplacement
+- **Souris** : Visée
+- **Clic gauche** : Tir
+- **R** : Recommencer (après game over ou victoire)
+- **ESC** : Quitter
 
-## Système de Points
+## Architecture du code
 
-- Regular : 100 points
-- Elite : 250 points
-- Officer : 400 points
-- Commander : 600 points
-- Tank : 800 points
-- Power-up collecté : 50 points
-- Niveau terminé : 500 × numéro du niveau
+Le projet utilise une architecture orientée objet avec les bonnes pratiques :
 
-## Développement
+- `main.py` : Point d'entrée et boucle de jeu principale
+- `game.py` : Gestionnaire principal du jeu
+- `player.py` : Classe du joueur avec contrôles et tir
+- `enemy.py` : Classe des ennemis avec IA
+- `bullet.py` : Classe des projectiles
+- `room.py` : Classe de la salle avec génération de murs
 
-### Ajouter un nouveau type d'ennemi
+## Bonnes pratiques implémentées
 
-1. Dans [entities/enemy.py](entities/enemy.py), ajouter la configuration dans `ENEMY_TYPES`
-2. Créer une méthode `_draw_<type>()` pour l'apparence
-3. Ajouter le type dans la logique de génération de [game/game.py](game/game.py)
-
-### Modifier les paramètres du jeu
-
-Tous les paramètres sont centralisés dans [config/settings.py](config/settings.py)
-
-## Auteurs
-
-Projet PyGame - Groupe 9
-
-## Licence
-
-Projet éducatif
+- **Séparation des responsabilités** : Chaque classe a une responsabilité unique
+- **Delta time** : Mouvement indépendant du framerate
+- **Groupes de sprites** : Gestion optimisée des collisions
+- **Commentaires et docstrings** : Code bien documenté
+- **Constantes configurables** : Facile à modifier les paramètres du jeu
