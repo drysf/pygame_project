@@ -38,26 +38,35 @@ class GameConfig:
     DARK_GREEN = (0, 100, 0)
 
 
-class Display:
-    """Gestionnaire d'affichage - Encapsulation de l'écran et des polices"""
-    def __init__(self):
-        self.screen = pygame.display.set_mode((GameConfig.SCREEN_WIDTH, GameConfig.SCREEN_HEIGHT))
-        pygame.display.set_caption("Bataille de Philadelphie - Révolution Américaine")
-        self.clock = pygame.time.Clock()
-        
-        # Polices
-        self.font_large = pygame.font.Font(None, 74)
-        self.font_medium = pygame.font.Font(None, 48)
-        self.font_small = pygame.font.Font(None, 36)
-    
-    def get_screen(self):
-        return self.screen
-    
-    def tick(self, fps):
-        self.clock.tick(fps)
-    
-    def flip(self):
-        pygame.display.flip()
+# Alias pour rétrocompatibilité
+SCREEN_WIDTH = GameConfig.SCREEN_WIDTH
+SCREEN_HEIGHT = GameConfig.SCREEN_HEIGHT
+FPS = GameConfig.FPS
+WHITE = GameConfig.WHITE
+BLACK = GameConfig.BLACK
+RED = GameConfig.RED
+BLUE = GameConfig.BLUE
+GREEN = GameConfig.GREEN
+YELLOW = GameConfig.YELLOW
+ORANGE = GameConfig.ORANGE
+BROWN = GameConfig.BROWN
+GRAY = GameConfig.GRAY
+DARK_GRAY = GameConfig.DARK_GRAY
+LIGHT_BLUE = GameConfig.LIGHT_BLUE
+DARK_BLUE = GameConfig.DARK_BLUE
+BRICK_RED = GameConfig.BRICK_RED
+CREAM = GameConfig.CREAM
+DARK_GREEN = GameConfig.DARK_GREEN
+
+# Fenêtre de jeu
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Bataille de Philadelphie - Révolution Américaine")
+clock = pygame.time.Clock()
+
+# Polices
+font_large = pygame.font.Font(None, 74)
+font_medium = pygame.font.Font(None, 48)
+font_small = pygame.font.Font(None, 36)
 
 
 class Camera:
