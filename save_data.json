@@ -1,6 +1,11 @@
 {
   "gold": 100,
   "owned_weapons": [
+<<<<<<< Updated upstream
+=======
+    "shotgun",
+    "rifle",
+>>>>>>> Stashed changes
     "handgun",
     "knife"
   ],
@@ -8,8 +13,16 @@
     0,
     1
   ],
+<<<<<<< Updated upstream
   "completed_levels": [],
   "total_kills": 0,
   "total_deaths": 4,
+=======
+  "completed_levels": [
+    0
+  ],
+  "total_kills": 85,
+  "total_deaths": 7,
+>>>>>>> Stashed changes
   "highest_level": 0
 }
