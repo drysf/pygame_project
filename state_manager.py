@@ -1,10 +1,10 @@
 """
-Gestionnaire d'états pour gérer les différentes scènes du jeu
+Gestionnaire d'états pour les différentes scènes du jeu
 """
 
 
 class StateManager:
-    """Gère les transitions entre états du jeu (menu, jeu, pause)"""
+    """Gère la transition entre états du jeu (menu, jeu, pause)"""
     
     def __init__(self):
         self.states = {}

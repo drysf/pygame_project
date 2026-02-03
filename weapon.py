@@ -1,5 +1,5 @@
 """
-Classe représentant les armes du jeu
+Définition desarmes du jeu
 """
 
 
