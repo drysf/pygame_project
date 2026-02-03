@@ -1,21 +1,15 @@
 {
-  "gold": 637,
+  "gold": 100,
   "owned_weapons": [
-    "shotgun",
     "handgun",
-    "knife",
-    "rifle"
+    "knife"
   ],
   "unlocked_levels": [
     0,
-    1,
-    2,
-    3
+    1
   ],
-  "completed_levels": [
-    0
-  ],
-  "total_kills": 105,
-  "total_deaths": 9,
+  "completed_levels": [],
+  "total_kills": 0,
+  "total_deaths": 4,
   "highest_level": 0
 }
