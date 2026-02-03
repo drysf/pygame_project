@@ -11,7 +11,7 @@ from weapon import WeaponManager
 class Player(pygame.sprite.Sprite):
     """Joueur contrôlé par l'utilisateur"""
     
-    def __init__(self, x, y):
+    def __init__(self, x, y, owned_weapons=None):
         super().__init__()
         
         # Animations
@@ -30,8 +30,8 @@ class Player(pygame.sprite.Sprite):
         self.health = self.max_health
         self.speed = 280
         
-        # Armes
-        self.weapon_manager = WeaponManager()
+        # Armes - uniquement celles possédées
+        self.weapon_manager = WeaponManager(owned_weapons)
         self.shoot_timer = 0
         self.can_shoot = True
         
