@@ -838,7 +838,7 @@ class MainMenu:
         self.font_small = pygame.font.Font(None, 35)
         
         # Options du menu
-        self.options = ["NEW GAME", "BOUTIQUE", "CREDITS", "QUIT"]
+        self.options = ["NOUVELLE PARTIE", "BOUTIQUE", "CREDITS", "QUITTER"]
         self.selected = 0
         
         # Éléments animés
@@ -1222,8 +1222,8 @@ class MainMenu:
             elif event.key == pygame.K_RETURN:
                 for i in range(len(self.soldiers)):
                     self.fire_musket(i)
-                return self._get_action()
-        
+                return self.get_action()
+       
         # Support souris
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             mouse_pos = pygame.mouse.get_pos()
@@ -1235,7 +1235,7 @@ class MainMenu:
                     self.selected = i
                     for j in range(len(self.soldiers)):
                         self.fire_musket(j)
-                    return self._get_action()
+                    return self.get_action()
         
         # Survol souris
         if event.type == pygame.MOUSEMOTION:
@@ -1249,22 +1249,21 @@ class MainMenu:
         
         return None
     
-    def _get_action(self):
+    def get_action(self):
         """Retourne l'action correspondant à l'option sélectionnée"""
         option = self.options[self.selected]
-        if option == "NEW GAME":
+        if option == "NOUVELLE PARTIE":
             return "play"
         elif option == "BOUTIQUE":
             return "shop"
         elif option == "CREDITS":
             return "credits"
-        elif option == "QUIT":
+        elif option == "QUITTER":
             return "quit"
         return None
-
-
+ 
 class LevelSelectMenu:
-    """Menu de sélection des niveaux - Style Colonial"""
+    """Menu de sélection des niveaux"""
     
     def __init__(self, screen):
         self.screen = screen
