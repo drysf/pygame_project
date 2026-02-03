@@ -230,74 +230,71 @@ class Room:
         for x, y, w, h in obstacles:
             self.walls.add(Wall(x, y, w, h))
     
-def _add_sprite_decorations(self):
-    """Ajoute des sprites réels dans les salles"""
-    room_width = self.screen_width
-    room_height = self.screen_height
+    def _add_sprite_decorations(self):
+        """Ajoute des sprites réels dans les salles"""
+        room_width = self.screen_width
+        room_height = self.screen_height
+        
+        # CONSULTEZ room_auto.py pour voir tous les noms disponibles !
+        # Format: (x, y, sprite_type)
+        sprite_obstacles = [
+            # SALLE 0,0 - Spawn avec quelques props
+            (room_width // 2, room_height // 2, 'pixel_village_fountain'),
+            (150, 150, 'pixel_village_barrel'),
+            (room_width - 150, 150, 'pixel_village_crate'),
+            
+            # SALLE 1,0 - Zone avec props
+            (room_width + 300, 300, 'pixel_village_table'),
+            (room_width + 500, 400, 'pixel_village_chair'),
+            
+            # SALLE 2,0 - Props centraux
+            (2 * room_width + room_width // 2, room_height // 2, 'pixel_village_well'),
+            
+            # SALLE 3,0 - Props variés
+            (3 * room_width + 300, 300, 'pixel_village_tree'),
+            (3 * room_width + 500, 400, 'pixel_village_rock'),
+            
+            # SALLE 0,1 - Props décoratifs
+            (300, room_height + 300, 'pixel_village_flower'),
+            (500, room_height + 400, 'pixel_village_bush'),
+            
+            # SALLE 1,1 - Zone de travail
+            (room_width + 400, room_height + 400, 'pixel_village_anvil'),
+            (room_width + 600, room_height + 400, 'pixel_village_forge'),
+            
+            # SALLE 2,1 - Entrepôt
+            (2 * room_width + 200, room_height + 200, 'pixel_village_crate'),
+            (2 * room_width + 250, room_height + 200, 'pixel_village_barrel'),
+            (2 * room_width + 300, room_height + 200, 'pixel_village_crate'),
+            
+            # SALLE 3,1 - Zone sombre
+            (3 * room_width + 300, room_height + 300, 'apocalypse_skull'),
+            (3 * room_width + 500, room_height + 400, 'apocalypse_bones'),
+            
+            # SALLE 0,2 - Nature
+            (200, 2 * room_height + 300, 'pixel_village_tree'),
+            (400, 2 * room_height + 400, 'pixel_village_tree'),
+            
+            # SALLE 1,2 - Campement
+            (room_width + 400, 2 * room_height + 400, 'pixel_village_tent'),
+            (room_width + 500, 2 * room_height + 500, 'pixel_village_bonfire'),
+            
+            # SALLE 2,2 - Arena
+            (2 * room_width + 300, 2 * room_height + 300, 'apocalypse_pillar'),
+            (2 * room_width + room_width - 300, 2 * room_height + 300, 'apocalypse_pillar'),
+            
+            # SALLE 3,2 - Boss
+            (3 * room_width + room_width // 2, 2 * room_height + room_height // 2, 'apocalypse_chest'),
+        ]
+        
+        for x, y, sprite_type in sprite_obstacles:
+            try:
+                sprite = SpriteWall(x, y, sprite_type=sprite_type)
+                self.walls.add(sprite)
+                self.solid_decorations.add(sprite)
+            except Exception as e:
+                print(f"⚠️  Sprite ignoré '{sprite_type}': {e}")
     
-    sprite_obstacles = [
-        # SALLE 0,0 - Spawn avec arbres et lampadaire
-        (room_width // 2 - 100, room_height // 2, 'apocalypsetree1sprucegreen'),
-        (150, 150, 'apocalypsetree3normalgreen'),
-        (room_width - 150, 150, 'apocalypsebush1green'),
-        (300, 200, 'apocalypsestreetlight1side'),
-        
-        # SALLE 1,0 - Zone avec camion
-        (room_width + 400, 300, 'apocalypsecar7rustredtruck'),
-        (room_width + 500, 500, 'apocalypsetree5biggreen'),
-        (room_width + 200, 200, 'apocalypsestreetlight2up'),
-        
-        # SALLE 2,0 - Arbres et lampadaires
-        (2 * room_width + 300, room_height // 2, 'apocalypsetree6pinebiggreen'),
-        (2 * room_width + 600, 300, 'apocalypsestreetlight1side'),
-        
-        # SALLE 3,0 - Camion bleu
-        (3 * room_width + 300, 300, 'apocalypsecar7rustbluetruck'),
-        (3 * room_width + 500, 400, 'apocalypsetree2sprucesparsegreen'),
-        
-        # SALLE 0,1 - Nature
-        (300, room_height + 300, 'apocalypsetree7birchgreen'),
-        (500, room_height + 400, 'apocalypsebush2green'),
-        (200, room_height + 200, 'apocalypsestreetlight3down'),
-        
-        # SALLE 1,1 - Zone urbaine
-        (room_width + 400, room_height + 400, 'apocalypsestreetlight1side'),
-        (room_width + 600, room_height + 300, 'apocalypsebarrelred1'),
-        
-        # SALLE 2,1 - Camion vert
-        (2 * room_width + 200, room_height + 200, 'apocalypsecar7rustgreentruck'),
-        (2 * room_width + 500, room_height + 400, 'apocalypsetree8birchgreen'),
-        
-        # SALLE 3,1 - Zone sombre
-        (3 * room_width + 300, room_height + 300, 'apocalypsecar7rustorangetruck'),
-        (3 * room_width + 500, room_height + 400, 'apocalypsestreetlight4sideovergrowndarkgreen'),
-        
-        # SALLE 0,2 - Forêt
-        (200, 2 * room_height + 300, 'apocalypsetree9smalloakgreen'),
-        (400, 2 * room_height + 400, 'apocalypsetree10smalloakgreen'),
-        (150, 2 * room_height + 150, 'apocalypsebush1green'),
-        
-        # SALLE 1,2 - Village
-        (room_width + 400, 2 * room_height + 400, 'apocalypsestreetlight5upovergrowngreen'),
-        (room_width + 600, 2 * room_height + 300, 'apocalypsebarrelblue1'),
-        
-        # SALLE 2,2 - Arena avec camion jaune
-        (2 * room_width + 300, 2 * room_height + 300, 'apocalypsecar7rustyellowtruck'),
-        (2 * room_width + room_width - 300, 2 * room_height + 300, 'apocalypsetree5biggreen'),
-        
-        # SALLE 3,2 - Boss
-        (3 * room_width + room_width // 2 + 200, 2 * room_height + room_height // 2, 'apocalypsecar7rustredtruck'),
-        (3 * room_width + 300, 2 * room_height + 300, 'apocalypsestreetlight2up'),
-    ]
-    
-    for x, y, sprite_type in sprite_obstacles:
-        try:
-            sprite = SpriteWall(x, y, sprite_type=sprite_type)
-            self.walls.add(sprite)
-            self.solid_decorations.add(sprite)
-        except Exception as e:
-            print(f"Sprite ignoré '{sprite_type}': {e}")
-
     def _create_exterior_zone(self):
         """Crée une zone extérieure avec végétation procédurale"""
         room_width = self.screen_width

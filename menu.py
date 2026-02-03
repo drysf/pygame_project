@@ -838,7 +838,7 @@ class MainMenu:
         self.font_small = pygame.font.Font(None, 35)
         
         # Options du menu
-        self.options = ["NEW GAME", "shop", "CREDITS", "QUIT"]
+        self.options = ["NEW GAME", "BOUTIQUE", "CREDITS", "QUIT"]
         self.selected = 0
         
         # Éléments animés
@@ -1254,7 +1254,7 @@ class MainMenu:
         option = self.options[self.selected]
         if option == "NEW GAME":
             return "play"
-        elif option == "shop":
+        elif option == "BOUTIQUE":
             return "shop"
         elif option == "CREDITS":
             return "credits"
@@ -1455,7 +1455,7 @@ class PauseMenu:
         self.font_large = pygame.font.Font(None, 50)
         
         # Options du menu pause
-        self.options = ["REPRENDRE", "MENU PRINCIPAL", "quit"]
+        self.options = ["REPRENDRE", "MENU PRINCIPAL", "QUITTER"]
         self.selected = 0
         self.time = 0
     
@@ -1505,7 +1505,7 @@ class PauseMenu:
             return 'resume'
         elif option == "MENU PRINCIPAL":
             return 'menu'
-        elif option == "quit":
+        elif option == "QUITTER":
             return 'quit'
         return None
     
