@@ -782,7 +782,6 @@ class DetailedSoldier:
                         (int(head_x - 3 * self.scale), int(head_y + 5 * self.scale)),
                         (int(head_x + 3 * self.scale), int(head_y + 5 * self.scale)), 1)
 
-
 class Pause :
     def __init__(self, screen):
         self.screen = screen
