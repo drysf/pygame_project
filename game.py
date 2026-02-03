@@ -4,7 +4,7 @@ Classe principale du jeu gérant tous les éléments
 import pygame
 import random
 from player import Player
-from enemy import Enemy
+from enemy import Enemy, EliteEnemy
 from bullet import Bullet
 from camera import Camera
 from level_manager import LevelManager
@@ -72,6 +72,8 @@ class Game:
     
     def _spawn_enemies(self, count):
         """Fait apparaître des ennemis répartis sur toute la carte"""
+        spawn_count = 0  # Compteur pour les élites
+        
         for _ in range(count):
             valid_position = False
             attempts = 0
@@ -86,7 +88,13 @@ class Game:
                            (y - self.player.pos.y) ** 2) ** 0.5
                 
                 if distance > 300:
-                    enemy = Enemy(x, y)
+                    spawn_count += 1
+                    # Créer un élite tous les 10 ennemis
+                    if spawn_count % 10 == 0:
+                        enemy = EliteEnemy(x, y)
+                    else:
+                        enemy = Enemy(x, y)
+                    
                     # Vérifier les collisions avec les murs
                     if not pygame.sprite.spritecollide(enemy, self.walls, False):
                         valid_position = True
@@ -145,7 +153,7 @@ class Game:
                     self.player.animations.trigger_shoot()
                     # Vérifier les ennemis dans la zone de mêlée
                     melee_rect = self.player.get_melee_rect()
-                    for enemy in self.enemies:
+                    for enemy in list(self.enemies):
                         if melee_rect.colliderect(enemy.rect):
                             if enemy.take_damage(weapon.damage):
                                 self._on_enemy_killed(enemy)
@@ -167,12 +175,13 @@ class Game:
                 self.all_sprites.add(bullet)
         
         # Mise à jour des balles du joueur
-        for bullet in self.player_bullets:
+        for bullet in list(self.player_bullets):
             bullet.update(dt)
             
             # Collision avec les murs
             if pygame.sprite.spritecollide(bullet, self.walls, False):
                 bullet.kill()
+                continue
             
             # Collision avec les ennemis
             hit_enemies = pygame.sprite.spritecollide(bullet, self.enemies, False)
@@ -184,12 +193,13 @@ class Game:
                         enemy.kill()
         
         # Mise à jour des balles ennemies
-        for bullet in self.enemy_bullets:
+        for bullet in list(self.enemy_bullets):
             bullet.update(dt)
             
             # Collision avec les murs
             if pygame.sprite.spritecollide(bullet, self.walls, False):
                 bullet.kill()
+                continue
             
             # Collision avec le joueur
             if pygame.sprite.collide_rect(bullet, self.player):
@@ -229,6 +239,10 @@ class Game:
             if screen_rect.right > 0 and screen_rect.left < self.screen_width and \
                screen_rect.bottom > 0 and screen_rect.top < self.screen_height:
                 self.screen.blit(sprite.image, screen_rect)
+        
+        # Dessiner les barres de vie des ennemis
+        for enemy in self.enemies:
+            enemy.draw_health_bar(self.screen, self.camera)
         
         # Dessiner le HUD
         self._draw_hud()
