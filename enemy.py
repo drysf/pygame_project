@@ -104,3 +104,42 @@ class Enemy(pygame.sprite.Sprite):
         """Inflige des dégâts à l'ennemi"""
         self.health -= damage
         return self.health <= 0
+    
+    def draw_health_bar(self, screen, camera):
+        """Dessine la barre de vie au-dessus de l'ennemi"""
+        # Dimensions de la barre
+        bar_width = 40
+        bar_height = 5
+        
+        # Position au-dessus de l'ennemi (en coordonnées monde)
+        bar_x = self.pos.x - bar_width // 2
+        bar_y = self.pos.y - 30
+        
+        # Convertir en coordonnées écran via la caméra
+        screen_x = bar_x - camera.x
+        screen_y = bar_y - camera.y
+        
+        # Calcul du remplissage
+        health_ratio = self.health / self.max_health
+        fill_width = int(bar_width * health_ratio)
+        
+        # Couleur selon la vie
+        if health_ratio > 0.6:
+            fill_color = (0, 255, 0)  # Vert
+        elif health_ratio > 0.3:
+            fill_color = (255, 255, 0)  # Jaune
+        else:
+            fill_color = (255, 0, 0)  # Rouge
+        
+        # Dessiner le fond (noir)
+        background_rect = pygame.Rect(screen_x, screen_y, bar_width, bar_height)
+        pygame.draw.rect(screen, (0, 0, 0), background_rect)
+        
+        # Dessiner le remplissage
+        if fill_width > 0:
+            fill_rect = pygame.Rect(screen_x, screen_y, fill_width, bar_height)
+            pygame.draw.rect(screen, fill_color, fill_rect)
+        
+        # Dessiner le contour
+        pygame.draw.rect(screen, (255, 255, 255), background_rect, 1)
+

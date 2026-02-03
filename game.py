@@ -112,7 +112,7 @@ class Game:
                     self.player.animations.trigger_shoot()
                     # Vérifier les ennemis dans la zone de mêlée
                     melee_rect = self.player.get_melee_rect()
-                    for enemy in self.enemies:
+                    for enemy in list(self.enemies):
                         if melee_rect.colliderect(enemy.rect):
                             if enemy.take_damage(weapon.damage):
                                 enemy.kill()
@@ -133,12 +133,13 @@ class Game:
                 self.all_sprites.add(bullet)
         
         # Mise à jour des balles du joueur
-        for bullet in self.player_bullets:
+        for bullet in list(self.player_bullets):
             bullet.update(dt)
             
             # Collision avec les murs
             if pygame.sprite.spritecollide(bullet, self.walls, False):
                 bullet.kill()
+                continue
             
             # Collision avec les ennemis
             hit_enemies = pygame.sprite.spritecollide(bullet, self.enemies, False)
@@ -149,12 +150,13 @@ class Game:
                         enemy.kill()
         
         # Mise à jour des balles ennemies
-        for bullet in self.enemy_bullets:
+        for bullet in list(self.enemy_bullets):
             bullet.update(dt)
             
             # Collision avec les murs
             if pygame.sprite.spritecollide(bullet, self.walls, False):
                 bullet.kill()
+                continue
             
             # Collision avec le joueur
             if pygame.sprite.collide_rect(bullet, self.player):
@@ -178,6 +180,10 @@ class Game:
             if screen_rect.right > 0 and screen_rect.left < self.screen_width and \
                screen_rect.bottom > 0 and screen_rect.top < self.screen_height:
                 self.screen.blit(sprite.image, screen_rect)
+        
+        # Dessiner les barres de vie des ennemis
+        for enemy in self.enemies:
+            enemy.draw_health_bar(self.screen, self.camera)
         
         # Dessiner le HUD
         self._draw_hud()
@@ -291,7 +297,8 @@ class Game:
         overlay.fill((0, 0, 0))
         self.screen.blit(overlay, (0, 0))
         
-        game_over_text = self.font.render("GAME OVER", True, (255, 0, 0))
+        game_over_font = pygame.font.Font(None, 100)
+        game_over_text = game_over_font.render("GAME OVER", True, (255, 0, 0))
         restart_text = self.font.render("Appuyez sur R pour recommencer", True, (255, 255, 255))
         
         text_rect = game_over_text.get_rect(center=(self.screen_width // 2, 
@@ -309,7 +316,8 @@ class Game:
         overlay.fill((0, 0, 0))
         self.screen.blit(overlay, (0, 0))
         
-        victory_text = self.font.render("VICTOIRE!", True, (0, 255, 0))
+        victory_font = pygame.font.Font(None, 100)
+        victory_text = victory_font.render("VICTOIRE!", True, (0, 255, 0))
         restart_text = self.font.render("Appuyez sur R pour recommencer", True, (255, 255, 255))
         
         text_rect = victory_text.get_rect(center=(self.screen_width // 2, 
