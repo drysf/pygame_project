@@ -11,7 +11,7 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, dx, dy, color, is_player=True, damage=None, speed=None, image=None):
         super().__init__()
         
-        # Position précise
+        # Position
         self.pos = pygame.math.Vector2(x, y)
         
         # Direction
@@ -25,7 +25,7 @@ class Bullet(pygame.sprite.Sprite):
         
         # Apparence
         if image:
-            # Utiliser l'image fournie et la pivoter dans la direction du tir
+            # Pivoter l'image dans la direction du tir
             angle = math.degrees(math.atan2(-dy, dx))
             self.image = pygame.transform.rotate(image, angle)
         else:
@@ -42,7 +42,7 @@ class Bullet(pygame.sprite.Sprite):
     
     def update(self, dt):
         """Met à jour la position de la balle"""
-        # Déplacement précis
+        # Déplacement
         self.pos.x += self.dx * self.speed * dt
         self.pos.y += self.dy * self.speed * dt
         

@@ -1,46 +1,65 @@
 """
-Jeu de tir top-down en Pygame
-Contrôlez un soldat américain dans des salles remplies d'ennemis
+Philladelphia Liberty
+Incarnez un soldat de la révolution américaine et combattez les anglais pour déclarer l'indépendance des Etats-Unis !
 """
 import pygame
 import sys
 from game import Game
+from pause import Pause
+from state_manager import StateManager
 
 
 def main():
-    """Point d'entrée principal du jeu"""
+    """Configuration principale du jeu"""
     pygame.init()
     
     # Configuration de la fenêtre
-    SCREEN_WIDTH = 1024
-    SCREEN_HEIGHT = 768
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("Top-Down Shooter")
+    screen = pygame.display.set_mode((1024, 768))
+    pygame.display.set_caption("Philadelphia Liberty")
     
-    # Initialisation du jeu
+    # Initialisation du jeu et de pause
     game = Game(screen)
+    pause_menu = Pause(screen)
+    
+    # Initialisation du manager d'état
+    state_manager = StateManager()
+    state_manager.add_state("game", game)
+    state_manager.add_state("pause", pause_menu)
+    state_manager.set_state("game")  # Démarrer en mode jeu
+    
     clock = pygame.time.Clock()
     
     # Boucle principale
     running = True
     while running:
-        dt = clock.tick(60) / 1000.0  # Delta time en secondes
+        dt = clock.tick(60) / 1000.0  # Delta de temps en secondes
         
-        # Gestion des événements
+        # Événements
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    running = False
+                    # Toggle entre jeu et pause
+                    if state_manager.current_state == "game":
+                        state_manager.set_state("pause")
+                    elif state_manager.current_state == "pause":
+                        state_manager.set_state("game")
             
-            game.handle_event(event)
+            # Déléguer les évènements au manager
+            state_manager.handle_event(event)
         
-        # Mise à jour du jeu
-        game.update(dt)
+        # Mise à jour si en jeu
+        if state_manager.current_state == "game":
+            state_manager.update(dt)
         
         # Rendu
-        game.draw()
+        game.draw()  # Toujours afficher le jeu en arrière-plan
+        
+        # Affichage écran pause au premier plan si nécessaire
+        if state_manager.current_state == "pause":
+            pause_menu.draw()
+        
         pygame.display.flip()
     
     pygame.quit()

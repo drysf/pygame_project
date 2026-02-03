@@ -5,7 +5,7 @@ import pygame
 
 
 class Camera:
-    """Caméra qui suit le joueur dans la carte"""
+    """Caméra qui suit le joueur sur la carte"""
     
     def __init__(self, screen_width, screen_height, map_width, map_height):
         self.screen_width = screen_width
@@ -18,7 +18,7 @@ class Camera:
         self.y = 0
     
     def update(self, target):
-        """Met à jour la position de la caméra pour suivre la cible"""
+        """Mise à jour de la position de la caméra pour suivre la cible"""
         # Centrer la caméra sur la cible
         self.x = target.pos.x - self.screen_width // 2
         self.y = target.pos.y - self.screen_height // 2

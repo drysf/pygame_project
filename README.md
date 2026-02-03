@@ -1,6 +1,8 @@
-# Jeu de Tir Top-Down en Pygame
+# Philadelphia Liberty
 
-Un jeu de tir vu du dessus où vous contrôlez un soldat américain dans des salles remplies d'ennemis.
+Un jeu de tir vu du dessus où vous contrôlez un soldat américain tentant de vaincre les soldats anglais.
+
+A vous de sauvez l'indépendance américaine !
 
 ## Fonctionnalités
 

@@ -1,5 +1,5 @@
 """
-Classe pour gérer les animations du joueur
+Animations du joueur
 """
 import pygame
 import os
@@ -64,7 +64,7 @@ class PlayerAnimations:
                     image = pygame.transform.scale(image, new_size)
                     frames.append(image)
                 except Exception as e:
-                    print(f"Erreur chargement {path}: {e}")
+                    print(f"Erreur de chargement {path}: {e}")
         
         return frames if frames else self._create_default_frames()
     

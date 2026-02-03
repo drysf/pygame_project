@@ -1,5 +1,5 @@
 """
-Classe représentant le joueur
+Définition du joueur
 """
 import pygame
 import math
@@ -11,7 +11,7 @@ from weapon import WeaponManager
 class Player(pygame.sprite.Sprite):
     """Joueur contrôlé par l'utilisateur"""
     
-    def __init__(self, x, y):
+    def __init__(self, x, y): 
         super().__init__()
         
         # Animations
@@ -30,15 +30,24 @@ class Player(pygame.sprite.Sprite):
         self.health = self.max_health
         self.speed = 280
         
+        # Charger l'image de balle
+        import os
+        bullet_path = os.path.join('assets', 'player', 'bullet', 'bullet.png')
+        try:
+            self.bullet_image = pygame.image.load(bullet_path).convert_alpha()
+        except pygame.error as e:
+            print(f"Erreur de chargement de l'image de balle: {e}")
+            self.bullet_image = None
+        
         # Armes
         self.weapon_manager = WeaponManager()
         self.shoot_timer = 0
         self.can_shoot = True
         
-        # État
+        # États
         self.is_moving = False
         self.angle = 0
-    
+
     @property
     def current_weapon(self):
         return self.weapon_manager.current_weapon
@@ -155,14 +164,15 @@ class Player(pygame.sprite.Sprite):
                     (255, 255, 0),
                     is_player=True,
                     damage=weapon.damage,
-                    speed=weapon.bullet_speed
+                    speed=weapon.bullet_speed,
+                    image=self.bullet_image  # ← Ajouter l'image
                 )
                 bullets.append(bullet)
         
         return bullets
     
     def _melee_attack(self):
-        """Attaque de mêlée (retourne les ennemis touchés via le système de jeu)"""
+        """Attaque de mêlée (retourne les ennemis touchés via le système)"""
         # Retourne une liste vide, le jeu gère la détection de mêlée
         return []
     
