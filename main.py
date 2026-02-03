@@ -12,10 +12,10 @@ from player_data import PlayerData
 
 # États du jeu
 STATE_MENU = "menu"
-STATE_LEVEL_SELECT = "Selectionner niveau"
+STATE_LEVEL_SELECT = "level_select"
 STATE_SHOP = "shop"
-STATE_PLAYING = "En jeu"
-STATE_PAUSED = "En pause"
+STATE_PLAYING = "playing"
+STATE_PAUSED = "paused"
 
 
 def main():
@@ -23,8 +23,10 @@ def main():
     pygame.init()
     
     # Configuration de la fenêtre
-    screen = pygame.display.set_mode((1024, 768))
-    pygame.display.set_caption("PHILADELPHIA LIBERTY")
+    SCREEN_WIDTH = 1024
+    SCREEN_HEIGHT = 768
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.display.set_caption("Top-Down Shooter - American Soldier")
     
     clock = pygame.time.Clock()
     
@@ -66,29 +68,29 @@ def main():
                     current_state = STATE_LEVEL_SELECT
                 elif action == "shop":
                     current_state = STATE_SHOP
-                elif action == "Niveaux":
+                elif action == "levels":
                     current_state = STATE_LEVEL_SELECT
                 elif action == "quit":
                     running = False
             
             elif current_state == STATE_LEVEL_SELECT:
                 action = level_select.handle_event(event)
-                if action == "Retour":
+                if action == "back":
                     current_state = STATE_MENU
                 elif action == "play":
                     current_level = level_select.get_selected_level()
                     if current_level:
                         game = Game(screen, current_level, player_data)
                         current_state = STATE_PLAYING
-                elif action == "Dévérouiller":
+                elif action == "unlocked":
                     player_data.save()
             
             elif current_state == STATE_SHOP:
                 action = shop.handle_event(event)
-                if action == "Précédent":
+                if action == "back":
                     player_data.save()
                     current_state = STATE_MENU
-                elif action == "Acheté":
+                elif action == "purchased":
                     player_data.save()
             
             elif current_state == STATE_PLAYING:
@@ -98,11 +100,11 @@ def main():
                         continue
                 
                 result = game.handle_event(event)
-                if result == "Menu":
+                if result == "menu":
                     player_data.save()
                     current_state = STATE_MENU
                     game = None
-                elif result == "Niveau suivant":
+                elif result == "next_level":
                     level_index = level_select.selected_level
                     if level_index + 1 < len(level_select.levels):
                         level_select.selected_level = level_index + 1
@@ -115,9 +117,9 @@ def main():
             
             elif current_state == STATE_PAUSED:
                 action = pause_menu.handle_event(event)
-                if action == "Reprendre":
+                if action == "resume":
                     current_state = STATE_PLAYING
-                elif action == "Menu":
+                elif action == "menu":
                     player_data.save()
                     current_state = STATE_MENU
                     game = None
@@ -153,7 +155,7 @@ def main():
         
         pygame.display.flip()
     
-    # Sauvegarder avant de quit
+    # Sauvegarder avant de quitter
     player_data.save()
     
     pygame.quit()

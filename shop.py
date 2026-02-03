@@ -1,12 +1,12 @@
 """
-Système de shop d'armes - US Army Armory
+Système de boutique d'armes - US Army Armory
 """
 import pygame
 from menu import Button
 
 
 class ShopItem:
-    """Article de la shop"""
+    """Article de la boutique"""
     
     def __init__(self, name, weapon_key, description, price, damage, fire_rate, special=""):
         self.name = name
@@ -20,7 +20,7 @@ class ShopItem:
 
 
 class Shop:
-    """shop d'armes - US Army Armory"""
+    """Boutique d'armes - US Army Armory"""
     
     def __init__(self, screen):
         self.screen = screen
@@ -177,7 +177,7 @@ class Shop:
             return None
     
     def draw(self):
-        """Dessine la shop - Style US Army"""
+        """Dessine la boutique - Style US Army"""
         # Fond avec dégradé militaire
         for y in range(self.screen_height):
             ratio = y / self.screen_height
