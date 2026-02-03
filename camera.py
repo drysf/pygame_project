@@ -36,6 +36,15 @@ class Camera:
             entity.rect.height
         )
     
+    def apply_rect(self, rect):
+        """Retourne un rectangle transformé par rapport à la caméra"""
+        return pygame.Rect(
+            rect.x - self.x,
+            rect.y - self.y,
+            rect.width,
+            rect.height
+        )
+    
     def apply_pos(self, pos):
         """Convertit une position monde en position écran"""
         return (pos[0] - self.x, pos[1] - self.y)

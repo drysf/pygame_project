@@ -6,17 +6,26 @@ import random
 from player import Player
 from enemy import Enemy
 from bullet import Bullet
-from room import Room
 from camera import Camera
+from level_manager import LevelManager
 
 
 class Game:
     """Gestionnaire principal du jeu"""
     
-    def __init__(self, screen):
+    def __init__(self, screen, level_config=None, player_data=None):
         self.screen = screen
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
+        
+        # Configuration du niveau
+        self.level_config = level_config or {"name": "Default", "enemies": 20, "map_type": "warehouse"}
+        self.player_data = player_data
+        
+        # Statistiques de la partie
+        self.kills = 0
+        self.gold_earned = 0
+        self.gold_per_kill = 25  # Or gagné par ennemi tué
         
         # Groupes de sprites
         self.all_sprites = pygame.sprite.Group()
@@ -24,29 +33,42 @@ class Game:
         self.player_bullets = pygame.sprite.Group()
         self.enemy_bullets = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
+        self.decorations = pygame.sprite.Group()
         
-        # Création de la salle (grande carte)
-        self.room = Room(self.screen_width, self.screen_height)
-        self.walls.add(self.room.walls)
-        self.all_sprites.add(self.room.walls)
+        # Création du niveau
+        level_manager = LevelManager(self.screen_width, self.screen_height)
+        self.current_map = level_manager.create_level(self.level_config)
+        
+        self.walls.add(self.current_map.walls)
+        self.all_sprites.add(self.current_map.walls)
+        self.decorations.add(self.current_map.decorations)
         
         # Création de la caméra
         self.camera = Camera(self.screen_width, self.screen_height,
-                            self.room.map_width, self.room.map_height)
+                            self.current_map.map_width, self.current_map.map_height)
         
-        # Création du joueur (dans la première salle)
-        self.player = Player(self.screen_width // 2, self.screen_height // 2)
+        # Création du joueur avec ses armes possédées
+        spawn_pos = self.current_map.get_spawn_position()
+        owned_weapons = None
+        if self.player_data:
+            owned_weapons = self.player_data.owned_weapons
+        self.player = Player(spawn_pos[0], spawn_pos[1], owned_weapons)
         self.all_sprites.add(self.player)
         
-        # Création des ennemis répartis sur la carte
-        self._spawn_enemies(20)
+        # Création des ennemis
+        enemy_count = self.level_config.get("enemies", 20)
+        self._spawn_enemies(enemy_count)
         
         # Police pour le HUD
         self.font = pygame.font.Font(None, 36)
+        self.small_font = pygame.font.Font(None, 24)
         
         # État du jeu
         self.game_over = False
         self.victory = False
+        
+        # Notifications de gain d'or
+        self.gold_notifications = []
     
     def _spawn_enemies(self, count):
         """Fait apparaître des ennemis répartis sur toute la carte"""
@@ -56,8 +78,8 @@ class Game:
             
             while not valid_position and attempts < 100:
                 # Position aléatoire sur toute la carte
-                x = random.randint(100, self.room.map_width - 100)
-                y = random.randint(100, self.room.map_height - 100)
+                x = random.randint(100, self.current_map.map_width - 100)
+                y = random.randint(100, self.current_map.map_height - 100)
                 
                 # Vérifier que l'ennemi n'est pas trop proche du joueur
                 distance = ((x - self.player.pos.x) ** 2 + 
@@ -75,14 +97,25 @@ class Game:
     
     def handle_event(self, event):
         """Gère les événements du jeu"""
-        if self.game_over or self.victory:
+        if self.game_over:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     self._restart_game()
-            return
+                elif event.key == pygame.K_m:
+                    return "menu"
+            return None
+        
+        if self.victory:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    return "next_level"
+                elif event.key == pygame.K_m:
+                    return "menu"
+            return None
         
         # Gérer le changement d'arme
         self.player.handle_weapon_switch(event)
+        return None
     
     def update(self, dt):
         """Met à jour tous les éléments du jeu"""
@@ -115,6 +148,7 @@ class Game:
                     for enemy in list(self.enemies):
                         if melee_rect.colliderect(enemy.rect):
                             if enemy.take_damage(weapon.damage):
+                                self._on_enemy_killed(enemy)
                                 enemy.kill()
             else:
                 bullets = self.player.shoot(mouse_world_pos, True)
@@ -147,6 +181,7 @@ class Game:
                 bullet.kill()
                 for enemy in hit_enemies:
                     if enemy.take_damage(bullet.damage):
+                        self._on_enemy_killed(enemy)
                         enemy.kill()
         
         # Mise à jour des balles ennemies
@@ -163,15 +198,31 @@ class Game:
                 bullet.kill()
                 if self.player.take_damage(bullet.damage):
                     self.game_over = True
+                    if self.player_data:
+                        self.player_data.record_death()
+        
+        # Mettre à jour les notifications d'or
+        self._update_gold_notifications(dt)
         
         # Vérifier la victoire
-        if len(self.enemies) == 0:
+        if len(self.enemies) == 0 and not self.victory:
             self.victory = True
+            self._on_level_complete()
     
     def draw(self):
         """Dessine tous les éléments du jeu"""
-        # Fond de la carte
+        # Fond de la carte (intérieur sombre)
         self.screen.fill((40, 40, 45))
+        
+        # Dessiner les zones extérieures (herbe verte)
+        self._draw_exterior_ground()
+        
+        # Dessiner les décorations d'abord (en arrière-plan)
+        for decoration in self.decorations:
+            screen_rect = self.camera.apply(decoration)
+            if screen_rect.right > 0 and screen_rect.left < self.screen_width and \
+               screen_rect.bottom > 0 and screen_rect.top < self.screen_height:
+                self.screen.blit(decoration.image, screen_rect)
         
         # Dessiner tous les sprites avec la caméra
         for sprite in self.all_sprites:
@@ -194,31 +245,62 @@ class Game:
         elif self.victory:
             self._draw_victory()
     
+    def _draw_exterior_ground(self):
+        """Dessine le sol des zones extérieures"""
+        # Dessiner le sol de base de la carte
+        if hasattr(self.current_map, 'ground_color'):
+            ground_rect = pygame.Rect(0, 0, self.current_map.map_width, self.current_map.map_height)
+            screen_rect = self.camera.apply_rect(ground_rect)
+            pygame.draw.rect(self.screen, self.current_map.ground_color, screen_rect)
+        
+        # Dessiner les zones extérieures spécifiques
+        if hasattr(self.current_map, 'exterior_zones'):
+            for zone_rect, color in self.current_map.exterior_zones:
+                screen_rect = self.camera.apply_rect(zone_rect)
+                if screen_rect.right > 0 and screen_rect.left < self.screen_width and \
+                   screen_rect.bottom > 0 and screen_rect.top < self.screen_height:
+                    pygame.draw.rect(self.screen, color, screen_rect)
+    
     def _draw_hud(self):
         """Dessine l'interface utilisateur"""
         # Fond du HUD
-        hud_bg = pygame.Surface((220, 170))
+        hud_bg = pygame.Surface((220, 200))
         hud_bg.set_alpha(180)
         hud_bg.fill((0, 0, 0))
         self.screen.blit(hud_bg, (5, 5))
         
+        # Nom du niveau
+        level_name = self.level_config.get("name", "Mission")
+        level_text = self.small_font.render(level_name, True, (255, 215, 0))
+        self.screen.blit(level_text, (10, 10))
+        
         # Barre de vie
         health_text = self.font.render(f"HP: {self.player.health}/{self.player.max_health}", 
                                        True, (255, 255, 255))
-        self.screen.blit(health_text, (10, 10))
+        self.screen.blit(health_text, (10, 35))
         
         # Compteur d'ennemis
         enemies_text = self.font.render(f"Ennemis: {len(self.enemies)}", 
                                        True, (255, 255, 255))
-        self.screen.blit(enemies_text, (10, 50))
+        self.screen.blit(enemies_text, (10, 70))
+        
+        # Or gagné cette partie
+        gold_text = self.font.render(f"$ +{self.gold_earned}", True, (255, 215, 0))
+        self.screen.blit(gold_text, (10, 100))
+        
+        # Or total
+        if self.player_data:
+            total_gold = self.small_font.render(f"Total: ${self.player_data.gold + self.gold_earned}", 
+                                                True, (200, 180, 100))
+            self.screen.blit(total_gold, (10, 125))
         
         # Barre de vie visuelle
         bar_width = 200
         bar_height = 20
         fill = (self.player.health / self.player.max_health) * bar_width
         fill = max(0, fill)
-        outline_rect = pygame.Rect(10, 90, bar_width, bar_height)
-        fill_rect = pygame.Rect(10, 90, fill, bar_height)
+        outline_rect = pygame.Rect(10, 150, bar_width, bar_height)
+        fill_rect = pygame.Rect(10, 150, fill, bar_height)
         
         # Couleur selon la vie
         if self.player.health > 60:
@@ -233,13 +315,11 @@ class Game:
         
         # Afficher l'arme actuelle
         weapon = self.player.current_weapon
-        weapon_text = self.font.render(f"Arme: {weapon.name}", True, (255, 200, 0))
-        self.screen.blit(weapon_text, (10, 120))
+        weapon_text = self.small_font.render(f"Arme: {weapon.name}", True, (255, 200, 0))
+        self.screen.blit(weapon_text, (10, 177))
         
-        # Instructions de changement d'arme
-        small_font = pygame.font.Font(None, 24)
-        switch_text = small_font.render("[1-5] ou molette pour changer", True, (150, 150, 150))
-        self.screen.blit(switch_text, (10, 150))
+        # Dessiner les notifications d'or
+        self._draw_gold_notifications()
         
         # Mini-carte
         self._draw_minimap()
@@ -257,8 +337,8 @@ class Game:
         minimap.fill((20, 20, 20))
         
         # Échelle
-        scale_x = minimap_width / self.room.map_width
-        scale_y = minimap_height / self.room.map_height
+        scale_x = minimap_width / self.current_map.map_width
+        scale_y = minimap_height / self.current_map.map_height
         
         # Dessiner les murs sur la mini-carte
         for wall in self.walls:
@@ -297,16 +377,23 @@ class Game:
         overlay.fill((0, 0, 0))
         self.screen.blit(overlay, (0, 0))
         
-        game_over_font = pygame.font.Font(None, 100)
-        game_over_text = game_over_font.render("GAME OVER", True, (255, 0, 0))
-        restart_text = self.font.render("Appuyez sur R pour recommencer", True, (255, 255, 255))
+        game_over_text = self.font.render("GAME OVER", True, (255, 0, 0))
+        kills_text = self.font.render(f"Ennemis tués: {self.kills}", True, (255, 255, 255))
+        gold_text = self.font.render(f"Or conservé: ${self.gold_earned // 2}", True, (255, 215, 0))
+        restart_text = self.small_font.render("[R] Recommencer  |  [M] Menu", True, (200, 200, 200))
         
         text_rect = game_over_text.get_rect(center=(self.screen_width // 2, 
-                                                     self.screen_height // 2 - 50))
+                                                     self.screen_height // 2 - 80))
+        kills_rect = kills_text.get_rect(center=(self.screen_width // 2, 
+                                                  self.screen_height // 2 - 20))
+        gold_rect = gold_text.get_rect(center=(self.screen_width // 2, 
+                                                self.screen_height // 2 + 20))
         restart_rect = restart_text.get_rect(center=(self.screen_width // 2, 
-                                                      self.screen_height // 2 + 50))
+                                                      self.screen_height // 2 + 80))
         
         self.screen.blit(game_over_text, text_rect)
+        self.screen.blit(kills_text, kills_rect)
+        self.screen.blit(gold_text, gold_rect)
         self.screen.blit(restart_text, restart_rect)
     
     def _draw_victory(self):
@@ -316,17 +403,29 @@ class Game:
         overlay.fill((0, 0, 0))
         self.screen.blit(overlay, (0, 0))
         
-        victory_font = pygame.font.Font(None, 100)
-        victory_text = victory_font.render("VICTOIRE!", True, (0, 255, 0))
-        restart_text = self.font.render("Appuyez sur R pour recommencer", True, (255, 255, 255))
+        victory_text = self.font.render("MISSION ACCOMPLIE!", True, (0, 255, 0))
+        level_name = self.level_config.get("name", "Mission")
+        level_text = self.font.render(f"{level_name} terminé!", True, (255, 255, 255))
+        kills_text = self.font.render(f"Ennemis tués: {self.kills}", True, (255, 255, 255))
+        gold_text = self.font.render(f"Or gagné: ${self.gold_earned}", True, (255, 215, 0))
+        continue_text = self.small_font.render("[ENTRÉE] Niveau suivant  |  [M] Menu", True, (200, 200, 200))
         
         text_rect = victory_text.get_rect(center=(self.screen_width // 2, 
-                                                   self.screen_height // 2 - 50))
-        restart_rect = restart_text.get_rect(center=(self.screen_width // 2, 
-                                                      self.screen_height // 2 + 50))
+                                                   self.screen_height // 2 - 100))
+        level_rect = level_text.get_rect(center=(self.screen_width // 2, 
+                                                  self.screen_height // 2 - 50))
+        kills_rect = kills_text.get_rect(center=(self.screen_width // 2, 
+                                                  self.screen_height // 2))
+        gold_rect = gold_text.get_rect(center=(self.screen_width // 2, 
+                                                self.screen_height // 2 + 50))
+        continue_rect = continue_text.get_rect(center=(self.screen_width // 2, 
+                                                        self.screen_height // 2 + 120))
         
         self.screen.blit(victory_text, text_rect)
-        self.screen.blit(restart_text, restart_rect)
+        self.screen.blit(level_text, level_rect)
+        self.screen.blit(kills_text, kills_rect)
+        self.screen.blit(gold_text, gold_rect)
+        self.screen.blit(continue_text, continue_rect)
     
     def _restart_game(self):
         """Redémarre le jeu"""
@@ -336,19 +435,85 @@ class Game:
         self.player_bullets.empty()
         self.enemy_bullets.empty()
         self.walls.empty()
+        self.decorations.empty()
         
-        # Recréer la salle
-        self.room = Room(self.screen_width, self.screen_height)
-        self.walls.add(self.room.walls)
-        self.all_sprites.add(self.room.walls)
+        # Réinitialiser les stats mais garder l'or partiel en cas de game over
+        if self.game_over and self.player_data:
+            self.player_data.gold += self.gold_earned // 2  # Garder la moitié de l'or
         
-        # Recréer le joueur
-        self.player = Player(self.screen_width // 2, self.screen_height // 2)
+        self.kills = 0
+        self.gold_earned = 0
+        self.gold_notifications = []
+        
+        # Recréer la carte
+        level_manager = LevelManager(self.screen_width, self.screen_height)
+        self.current_map = level_manager.create_level(self.level_config)
+        
+        self.walls.add(self.current_map.walls)
+        self.all_sprites.add(self.current_map.walls)
+        self.decorations.add(self.current_map.decorations)
+        
+        # Recréer le joueur avec ses armes possédées
+        spawn_pos = self.current_map.get_spawn_position()
+        owned_weapons = None
+        if self.player_data:
+            owned_weapons = self.player_data.owned_weapons
+        self.player = Player(spawn_pos[0], spawn_pos[1], owned_weapons)
         self.all_sprites.add(self.player)
         
         # Recréer les ennemis
-        self._spawn_enemies(20)
+        enemy_count = self.level_config.get("enemies", 20)
+        self._spawn_enemies(enemy_count)
+        
+        # Réinitialiser la caméra
+        self.camera = Camera(self.screen_width, self.screen_height,
+                            self.current_map.map_width, self.current_map.map_height)
         
         # Réinitialiser l'état
         self.game_over = False
         self.victory = False
+    
+    def _on_enemy_killed(self, enemy):
+        """Appelé quand un ennemi est tué"""
+        self.kills += 1
+        self.gold_earned += self.gold_per_kill
+        
+        # Ajouter une notification d'or
+        screen_pos = self.camera.apply_pos((enemy.pos.x, enemy.pos.y))
+        self.gold_notifications.append({
+            'text': f'+${self.gold_per_kill}',
+            'pos': list(screen_pos),
+            'timer': 1.0,
+            'alpha': 255
+        })
+    
+    def _on_level_complete(self):
+        """Appelé quand le niveau est terminé"""
+        if self.player_data:
+            # Trouver l'index du niveau actuel
+            level_index = 0
+            level_names = ["Entrepôt", "Base Militaire", "Forêt", "Bunker", "QG Ennemi"]
+            level_name = self.level_config.get("name", "")
+            if level_name in level_names:
+                level_index = level_names.index(level_name)
+            
+            self.player_data.complete_level(level_index, self.gold_earned, self.kills)
+            self.player_data.save()
+    
+    def _update_gold_notifications(self, dt):
+        """Met à jour les notifications d'or"""
+        for notif in self.gold_notifications[:]:
+            notif['timer'] -= dt
+            notif['pos'][1] -= 50 * dt  # Monte vers le haut
+            notif['alpha'] = int(255 * (notif['timer'] / 1.0))
+            
+            if notif['timer'] <= 0:
+                self.gold_notifications.remove(notif)
+    
+    def _draw_gold_notifications(self):
+        """Dessine les notifications d'or"""
+        for notif in self.gold_notifications:
+            font = pygame.font.Font(None, 28)
+            text = font.render(notif['text'], True, (255, 215, 0))
+            text.set_alpha(notif['alpha'])
+            self.screen.blit(text, notif['pos'])
