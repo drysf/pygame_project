@@ -1,12 +1,29 @@
 """
 Classe représentant une salle avec des murs
 """
+import os
 import pygame
 import random
 import math
 from room_auto import Wall as SpriteWall
 
+ASSETS_ENV_PATH = os.path.join("assets", "Environnement")
 
+def load_random_image(subfolder, scale=None):
+    """Charge une image aléatoire dans assets/Environnement/<subfolder>"""
+    folder_path = os.path.join(ASSETS_ENV_PATH, subfolder)
+    files = [
+        f for f in os.listdir(folder_path)
+        if f.lower().endswith((".png", ".jpg", ".jpeg"))
+    ]
+    if not files:
+        raise FileNotFoundError(f"Aucun asset dans {folder_path}")
+    filename = random.choice(files)
+    full_path = os.path.join(folder_path, filename)
+    image = pygame.image.load(full_path).convert_alpha()
+    if scale is not None:
+        image = pygame.transform.scale(image, scale)
+    return image
 class Wall(pygame.sprite.Sprite):
     """Mur simple gris"""
     
@@ -19,64 +36,39 @@ class Wall(pygame.sprite.Sprite):
 
 
 class Tree(pygame.sprite.Sprite):
-    """Arbre décoratif (collision)"""
-    
+    """Arbre décoratif (collision) basé sur un asset"""
     def __init__(self, x, y, size=50):
         super().__init__()
-        self.image = pygame.Surface((size, size), pygame.SRCALPHA)
-        
-        # Tronc
-        trunk_width = size // 5
-        trunk_height = size // 2
-        trunk_x = (size - trunk_width) // 2
-        trunk_y = size - trunk_height
-        pygame.draw.rect(self.image, (101, 67, 33), (trunk_x, trunk_y, trunk_width, trunk_height))
-        
-        # Feuillage (cercles verts)
-        leaf_color = (34, 139, 34)
-        leaf_radius = size // 3
-        pygame.draw.circle(self.image, leaf_color, (size // 2, size // 3), leaf_radius)
-        pygame.draw.circle(self.image, (46, 125, 50), (size // 3, size // 2), leaf_radius - 5)
-        pygame.draw.circle(self.image, (56, 142, 60), (2 * size // 3, size // 2), leaf_radius - 5)
-        
+        # Par exemple on fixe la hauteur à size et on garde le ratio
+        img = load_random_image("Arbres")  # assets/Environnement/Arbres
+        w, h = img.get_size()
+        new_h = size
+        new_w = int(w * (new_h / h))
+        self.image = pygame.transform.scale(img, (new_w, new_h))
         self.rect = self.image.get_rect(center=(x, y))
 
 
 class Bush(pygame.sprite.Sprite):
-    """Buisson décoratif (pas de collision)"""
-    
+    """Buisson décoratif (pas de collision) basé sur un asset"""
     def __init__(self, x, y, size=30):
         super().__init__()
-        self.image = pygame.Surface((size, size // 2), pygame.SRCALPHA)
-        
-        colors = [(34, 139, 34), (46, 125, 50), (60, 160, 60)]
-        for i in range(3):
-            offset_x = i * (size // 4) + size // 6
-            offset_y = size // 4
-            radius = size // 4 + random.randint(-2, 2)
-            pygame.draw.circle(self.image, colors[i % len(colors)], (offset_x, offset_y), radius)
-        
+        img = load_random_image("Bush")
+        w, h = img.get_size()
+        new_h = size
+        new_w = int(w * (new_h / h))
+        self.image = pygame.transform.scale(img, (new_w, new_h))
         self.rect = self.image.get_rect(center=(x, y))
-
 
 class GrassPatch(pygame.sprite.Sprite):
-    """Touffe d'herbe décorative"""
-    
+    """Touffe d'herbe décorative basée sur un asset"""
     def __init__(self, x, y, size=20):
         super().__init__()
-        self.image = pygame.Surface((size, size), pygame.SRCALPHA)
-        
-        grass_colors = [(34, 139, 34), (50, 150, 50), (76, 175, 80)]
-        for i in range(5):
-            start_x = i * (size // 5) + size // 10
-            start_y = size
-            end_x = start_x + random.randint(-3, 3)
-            end_y = random.randint(2, size // 2)
-            color = grass_colors[i % len(grass_colors)]
-            pygame.draw.line(self.image, color, (start_x, start_y), (end_x, end_y), 2)
-        
+        img = load_random_image("Herbe")
+        w, h = img.get_size()
+        new_h = size
+        new_w = int(w * (new_h / h))
+        self.image = pygame.transform.scale(img, (new_w, new_h))
         self.rect = self.image.get_rect(center=(x, y))
-
 
 class Rock(pygame.sprite.Sprite):
     """Rocher décoratif (collision)"""
@@ -104,26 +96,15 @@ class Rock(pygame.sprite.Sprite):
 
 
 class Flower(pygame.sprite.Sprite):
-    """Fleur décorative"""
-    
+    """Fleur décorative basée sur un asset"""
     def __init__(self, x, y, size=15):
         super().__init__()
-        self.image = pygame.Surface((size, size), pygame.SRCALPHA)
-        
-        pygame.draw.line(self.image, (34, 139, 34), (size // 2, size), (size // 2, size // 2), 2)
-        
-        petal_colors = [(255, 182, 193), (255, 105, 180), (255, 255, 0), (255, 165, 0), (148, 0, 211)]
-        color = random.choice(petal_colors)
-        center = (size // 2, size // 3)
-        for angle in range(0, 360, 72):
-            rad = math.radians(angle)
-            px = int(center[0] + 4 * math.cos(rad))
-            py = int(center[1] + 4 * math.sin(rad))
-            pygame.draw.circle(self.image, color, (px, py), 3)
-        
-        pygame.draw.circle(self.image, (255, 255, 0), center, 2)
+        img = load_random_image("Fleurs")
+        w, h = img.get_size()
+        new_h = size
+        new_w = int(w * (new_h / h))
+        self.image = pygame.transform.scale(img, (new_w, new_h))
         self.rect = self.image.get_rect(center=(x, y))
-
 
 class WaterPuddle(pygame.sprite.Sprite):
     """Flaque d'eau décorative"""
