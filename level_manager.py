@@ -182,7 +182,7 @@ class ForestMap(BaseMap):
             if abs(x - self.screen_width // 2) < 200 and abs(y - self.screen_height // 2) < 200:
                 continue
             
-            tree = Tree(x, y, random.randint(50, 80))
+            tree = Tree(x, y, random.randint(150, 210))
             self.walls.add(tree)
         
         # Rochers
@@ -196,7 +196,7 @@ class ForestMap(BaseMap):
         for _ in range(80):
             x = random.randint(50, self.map_width - 50)
             y = random.randint(50, self.map_height - 50)
-            bush = Bush(x, y, random.randint(25, 45))
+            bush = Bush(x, y, random.randint(45, 65))
             self.decorations.add(bush)
         
         # Herbe
