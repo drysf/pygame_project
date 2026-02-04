@@ -70,13 +70,18 @@ class BaseMap:
         """Retourne les zones où les ennemis peuvent spawn"""
         return [(100, 100, self.map_width - 200, self.map_height - 200)]
         
-    def _load_ground_image(self, level_number):
-        """Charge l'image du sol pour un niveau spécifique"""
+    def _load_ground_image(self, level_number, tile_size=400):
+        """Charge l'image du sol pour un niveau spécifique et la redimensionne"""
         try:
             asset_path = os.path.join("assets", "Environnement", "Sol", f"sol{level_number}.png")
             if os.path.exists(asset_path):
-                self.ground_image = pygame.image.load(asset_path).convert()
-                print(f"✓ Sol niveau {level_number} chargé: {asset_path}")
+                # Charger l'image originale
+                original_image = pygame.image.load(asset_path).convert()
+                
+                # Redimensionner l'image pour créer une tuile
+                self.ground_image = pygame.transform.scale(original_image, (tile_size, tile_size))
+                
+                print(f"✓ Sol niveau {level_number} chargé et redimensionné à {tile_size}x{tile_size}: {asset_path}")
             else:
                 print(f"✗ Image de sol non trouvée: {asset_path}")
         except Exception as e:
