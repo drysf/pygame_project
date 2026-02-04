@@ -343,18 +343,33 @@ class Game:
 
     def _draw_exterior_ground(self):
         """Dessine le sol des zones extérieures"""
-        if hasattr(self.current_map, 'ground_color'):
-            ground_rect = pygame.Rect(0, 0, self.current_map.map_width, self.current_map.map_height)
-            screen_rect = self.camera.apply_rect(ground_rect)
+        ground_rect = pygame.Rect(0, 0, self.current_map.map_width, self.current_map.map_height)
+        screen_rect = self.camera.apply_rect(ground_rect)
+        
+        # Utiliser l'image si disponible, sinon la couleur
+        if hasattr(self.current_map, 'ground_image') and self.current_map.ground_image:
+            # Répéter l'image en tuiles pour couvrir toute la carte
+            tile_width = self.current_map.ground_image.get_width()
+            tile_height = self.current_map.ground_image.get_height()
+            
+            for x in range(0, self.current_map.map_width, tile_width):
+                for y in range(0, self.current_map.map_height, tile_height):
+                    tile_rect = pygame.Rect(x, y, tile_width, tile_height)
+                    screen_tile_rect = self.camera.apply_rect(tile_rect)
+                    # Optimisation : ne dessiner que si visible à l'écran
+                    if screen_tile_rect.colliderect(pygame.Rect(0, 0, self.screen_width, self.screen_height)):
+                        self.screen.blit(self.current_map.ground_image, screen_tile_rect)
+        elif hasattr(self.current_map, 'ground_color'):
+            # Fallback sur la couleur si pas d'image
             pygame.draw.rect(self.screen, self.current_map.ground_color, screen_rect)
-
+        
+        # Zones extérieures spécifiques (ForestMap et HeadquartersMap)
         if hasattr(self.current_map, 'exterior_zones'):
             for zone_rect, color in self.current_map.exterior_zones:
                 screen_rect = self.camera.apply_rect(zone_rect)
                 if screen_rect.right > 0 and screen_rect.left < self.screen_width and \
                    screen_rect.bottom > 0 and screen_rect.top < self.screen_height:
                     pygame.draw.rect(self.screen, color, screen_rect)
-
     def _draw_hud(self):
         """Dessine l'interface utilisateur"""
         hud_bg = pygame.Surface((220, 200))

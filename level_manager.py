@@ -3,6 +3,7 @@ Gestionnaire de niveaux - Génère différentes cartes
 """
 import pygame
 import random
+import os
 from room import Wall, Tree, Bush, GrassPatch, Rock, Flower, WaterPuddle
 
 
@@ -43,6 +44,7 @@ class BaseMap:
         self.walls = pygame.sprite.Group()
         self.decorations = pygame.sprite.Group()
         self.ground_color = (40, 40, 45)
+        self.ground_image = None # Image de sol
         self.exterior_zones = []  # Liste de (rect, color) pour zones extérieures
         
         self._create_boundary_walls()
@@ -67,7 +69,18 @@ class BaseMap:
     def get_enemy_spawn_zones(self):
         """Retourne les zones où les ennemis peuvent spawn"""
         return [(100, 100, self.map_width - 200, self.map_height - 200)]
-
+        
+    def _load_ground_image(self, level_number):
+        """Charge l'image du sol pour un niveau spécifique"""
+        try:
+            asset_path = os.path.join("assets", "Environnement", "Sol", f"sol{level_number}.png")
+            if os.path.exists(asset_path):
+                self.ground_image = pygame.image.load(asset_path).convert()
+                print(f"✓ Sol niveau {level_number} chargé: {asset_path}")
+            else:
+                print(f"✗ Image de sol non trouvée: {asset_path}")
+        except Exception as e:
+            print(f"✗ Erreur chargement sol {level_number}: {e}")
 
 class WarehouseMap(BaseMap):
     """Carte: Entrepôt - Zone d'entraînement"""
@@ -77,7 +90,8 @@ class WarehouseMap(BaseMap):
         self.map_width = int(screen_width * 2)
         self.map_height = int(screen_height * 1.5)
         self.ground_color = (50, 45, 40)
-        
+        self._load_ground_image(1) # Charger le sol du niveau 1
+
         # Recréer les murs de bordure avec la bonne taille
         self.walls.empty()
         self._create_boundary_walls()
@@ -115,7 +129,8 @@ class MilitaryBaseMap(BaseMap):
         self.map_width = int(screen_width * 3)
         self.map_height = int(screen_height * 2)
         self.ground_color = (45, 50, 45)
-        
+        self._load_ground_image(2)  # Charge sol niveau 2
+
         self.walls.empty()
         self._create_boundary_walls()
         self._create_base_layout()
@@ -168,6 +183,7 @@ class ForestMap(BaseMap):
         self.map_width = int(screen_width * 3)
         self.map_height = int(screen_height * 3)
         self.ground_color = (34, 85, 34)
+        self._load_ground_image(3)  # Charge sol niveau 3
         
         self.walls.empty()
         self._create_boundary_walls()
@@ -236,6 +252,7 @@ class BunkerMap(BaseMap):
         self.map_width = int(screen_width * 2.5)
         self.map_height = int(screen_height * 2)
         self.ground_color = (35, 35, 40)
+        self._load_ground_image(4)  # Charge sol niveau 4
         
         self.walls.empty()
         self._create_boundary_walls()
@@ -295,6 +312,7 @@ class HeadquartersMap(BaseMap):
         self.map_width = int(screen_width * 4)
         self.map_height = int(screen_height * 3)
         self.ground_color = (40, 35, 35)
+        self._load_ground_image(5)  # Charge sol niveau 5
         
         self.walls.empty()
         self._create_boundary_walls()
