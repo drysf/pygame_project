@@ -8338,7 +8338,7 @@ class Wall(pygame.sprite.Sprite):
                 'width': 231,
                 'height': 169
             }
-            print(f"✓ {len(cls.sprites_cache)} sprites chargés")
+            print(f"[OK] {len(cls.sprites_cache)} sprites chargés")
     
     def __init__(self, x, y, width=None, height=None, sprite_type=None):
         super().__init__()

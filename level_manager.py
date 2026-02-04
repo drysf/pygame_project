@@ -81,11 +81,11 @@ class BaseMap:
                 # Redimensionner l'image pour créer une tuile
                 self.ground_image = pygame.transform.scale(original_image, (tile_size, tile_size))
                 
-                print(f"✓ Sol niveau {level_number} chargé et redimensionné à {tile_size}x{tile_size}: {asset_path}")
+                print(f"[OK] Sol niveau {level_number} chargé et redimensionné à {tile_size}x{tile_size}: {asset_path}")
             else:
-                print(f"✗ Image de sol non trouvée: {asset_path}")
+                print(f"[ERREUR] Image de sol non trouvée: {asset_path}")
         except Exception as e:
-            print(f"✗ Erreur chargement sol {level_number}: {e}")
+            print(f"[ERREUR] Erreur chargement sol {level_number}: {e}")
 
 class WarehouseMap(BaseMap):
     """Carte: Entrepôt - Zone d'entraînement"""
@@ -121,9 +121,9 @@ class WarehouseMap(BaseMap):
             try:
                 crate = Wall(x, y, sprite_type='apocalypse_crate_wood_1')  # ← N'existe PAS !
                 self.walls.add(crate)
-                print(f"✓ Caisse créée en ({x}, {y})")
+                print(f"[OK] Caisse créée en ({x}, {y})")
             except Exception as e:
-                print(f"✗ Erreur caisse: {e}")
+                print(f"[ERREUR] Erreur caisse: {e}")
 
 
 class MilitaryBaseMap(BaseMap):

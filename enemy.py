@@ -4,19 +4,38 @@ Classe représentant les ennemis
 import pygame
 import math
 import random
-
+import os
 
 class Enemy(pygame.sprite.Sprite):
     """Ennemi contrôlé par l'IA"""
     
+    # Cache pour l'image du soldat
+    _soldier_image = None
+    
+    @classmethod
+    def _load_soldier_image(cls):
+        """Charge l'image du soldat (une seule fois)"""
+        if cls._soldier_image is None:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            image_path = os.path.join(script_dir, 'assets', 'england_soldier', 'soldier.png')
+            try:
+                original = pygame.image.load(image_path).convert_alpha()
+                # Redimensionner à 130x130
+                scaled = pygame.transform.scale(original, (130, 130))
+                # Retourner l'image (elle était à l'envers)
+                cls._soldier_image = pygame.transform.flip(scaled, False, True)
+            except Exception as e:
+                print(f"[ERREUR] Chargement soldier.png: {e}")
+                # Fallback: carré rouge
+                cls._soldier_image = pygame.Surface((130, 130), pygame.SRCALPHA)
+                cls._soldier_image.fill((200, 50, 50))
+        return cls._soldier_image
+    
     def __init__(self, x, y):
         super().__init__()
         
-        # Apparence
-        self.original_image = pygame.Surface((35, 35), pygame.SRCALPHA)
-        self.original_image.fill((200, 50, 50))
-        pygame.draw.polygon(self.original_image, (150, 0, 0), 
-                          [(17, 0), (35, 35), (0, 35)])
+        # Apparence - charger l'image du soldat
+        self.original_image = Enemy._load_soldier_image().copy()
         
         self.image = self.original_image.copy()
         self.rect = self.image.get_rect(center=(x, y))
@@ -161,32 +180,16 @@ class EliteEnemy(Enemy):
         self.speed = 100  # Un peu plus lent mais tank
         self.gold_reward = 50  # Plus d'or
         
-        # Apparence noir et rouge distinctive
-        size = 45  # Plus grand
-        self.original_image = pygame.Surface((size, size), pygame.SRCALPHA)
+        # Apparence - soldat agrandi et teinté en rouge pour l'élite
+        size = 160  # Plus grand
+        base_image = Enemy._load_soldier_image()
+        scaled = pygame.transform.scale(base_image, (size, size))
         
-        # Corps noir
-        self.original_image.fill((30, 30, 30))
-        
-        # Triangle rouge menaçant
-        pygame.draw.polygon(self.original_image, (180, 0, 0), 
-                          [(size // 2, 2), (size - 2, size - 2), (2, size - 2)])
-        
-        # Contour rouge vif
-        pygame.draw.polygon(self.original_image, (255, 0, 0), 
-                          [(size // 2, 2), (size - 2, size - 2), (2, size - 2)], 3)
-        
-        # Yeux rouges lumineux
-        pygame.draw.circle(self.original_image, (255, 50, 50), (size // 2 - 8, size // 2), 4)
-        pygame.draw.circle(self.original_image, (255, 50, 50), (size // 2 + 8, size // 2), 4)
-        pygame.draw.circle(self.original_image, (255, 200, 200), (size // 2 - 8, size // 2), 2)
-        pygame.draw.circle(self.original_image, (255, 200, 200), (size // 2 + 8, size // 2), 2)
-        
-        # Symbole X au centre
-        pygame.draw.line(self.original_image, (255, 0, 0), 
-                        (size // 2 - 6, size // 2 + 8), (size // 2 + 6, size // 2 + 16), 2)
-        pygame.draw.line(self.original_image, (255, 0, 0), 
-                        (size // 2 + 6, size // 2 + 8), (size // 2 - 6, size // 2 + 16), 2)
+        # Teinter l'image en rouge pour l'élite
+        self.original_image = scaled.copy()
+        red_overlay = pygame.Surface((size, size), pygame.SRCALPHA)
+        red_overlay.fill((255, 50, 50, 80))  # Teinte rouge semi-transparente
+        self.original_image.blit(red_overlay, (0, 0))
         
         self.image = self.original_image.copy()
         self.rect = self.image.get_rect(center=(x, y))
