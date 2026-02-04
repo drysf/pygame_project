@@ -8,6 +8,19 @@ from animation import PlayerAnimations
 from weapon import WeaponManager
 
 
+# Son de tir (sera chargé à la première utilisation)
+GUNSHOT_SOUND = None
+
+
+def get_gunshot_sound():
+    """Charge le son de tir si ce n'est pas déjà fait"""
+    global GUNSHOT_SOUND
+    if GUNSHOT_SOUND is None:
+        GUNSHOT_SOUND = pygame.mixer.Sound("assets/Sons/gunshot.mp3")
+        GUNSHOT_SOUND.set_volume(0.8)
+    return GUNSHOT_SOUND
+
+
 class Player(pygame.sprite.Sprite):
     """Joueur contrôlé par l'utilisateur"""
     
@@ -87,7 +100,6 @@ class Player(pygame.sprite.Sprite):
     
     def _check_wall_collision(self, walls):
         """Vérifie la collision avec les murs"""
-        # Créer un rect plus petit pour la collision
         collision_rect = pygame.Rect(0, 0, 30, 30)
         collision_rect.center = self.rect.center
         
@@ -102,7 +114,6 @@ class Player(pygame.sprite.Sprite):
         dy = mouse_pos[1] - self.pos.y
         self.angle = math.degrees(math.atan2(-dy, dx))
         
-        # Obtenir le frame actuel et le pivoter
         self.original_image = self.animations.get_current_frame()
         self.image = pygame.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect(center=(int(self.pos.x), int(self.pos.y)))
@@ -111,11 +122,9 @@ class Player(pygame.sprite.Sprite):
         """Tire des balles vers la cible"""
         weapon = self.current_weapon
         
-        # Vérifier le cooldown
         if self.shoot_timer < weapon.cooldown:
             return []
         
-        # Armes semi-auto
         if not weapon.auto_fire:
             if not self.can_shoot:
                 return []
@@ -125,13 +134,11 @@ class Player(pygame.sprite.Sprite):
         self.shoot_timer = 0
         self.animations.trigger_shoot()
         
-        # Si c'est une arme de mêlée (pas de balles)
         if weapon.bullet_speed == 0:
             return self._melee_attack()
         
         bullets = []
         
-        # Direction de base
         dx = target_pos[0] - self.pos.x
         dy = target_pos[1] - self.pos.y
         distance = math.sqrt(dx * dx + dy * dy)
@@ -139,7 +146,6 @@ class Player(pygame.sprite.Sprite):
         if distance > 0:
             base_angle = math.atan2(dy, dx)
             
-            # Créer les balles avec dispersion
             for i in range(weapon.bullet_count):
                 spread_angle = math.radians(random.uniform(-weapon.spread, weapon.spread))
                 angle = base_angle + spread_angle
@@ -159,11 +165,14 @@ class Player(pygame.sprite.Sprite):
                 )
                 bullets.append(bullet)
         
+        # Jouer le son si des balles ont été créées
+        if bullets:
+            get_gunshot_sound().play()
+        
         return bullets
     
     def _melee_attack(self):
-        """Attaque de mêlée (retourne les ennemis touchés via le système de jeu)"""
-        # Retourne une liste vide, le jeu gère la détection de mêlée
+        """Attaque de mêlée"""
         return []
     
     def handle_weapon_switch(self, event):
@@ -188,7 +197,6 @@ class Player(pygame.sprite.Sprite):
                 weapon_changed = True
             
             if weapon_changed:
-                # Mettre à jour l'animation pour la nouvelle arme
                 self.animations.set_weapon(self.current_weapon.animation_key)
         
         elif event.type == pygame.MOUSEWHEEL:
@@ -209,7 +217,6 @@ class Player(pygame.sprite.Sprite):
     
     def get_melee_rect(self):
         """Retourne le rectangle d'attaque de mêlée"""
-        # Zone devant le joueur
         angle_rad = math.radians(-self.angle)
         offset_x = math.cos(angle_rad) * 50
         offset_y = -math.sin(angle_rad) * 50

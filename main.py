@@ -122,6 +122,10 @@ def main():
                     player_data.save()
                     current_state = STATE_MENU
                     game = None
+                    # Retour son du menu
+                    pygame.mixer.music.load(MUSIC_MENU)
+                    pygame.mixer.music.set_volume(0.6)
+                    pygame.mixer.music.play(-1)
                 elif result == "next_level":
                     level_index = level_select.selected_level
                     if level_index + 1 < len(level_select.levels):
@@ -132,6 +136,10 @@ def main():
                     else:
                         current_state = STATE_MENU
                         game = None
+                        # Retour son du menu
+                        pygame.mixer.music.load(MUSIC_MENU)
+                        pygame.mixer.music.set_volume(0.6)
+                        pygame.mixer.music.play(-1)
                 elif result == "game_over":
                     # Musique de game over (suppose que Game renvoie "game_over")
                     pygame.mixer.music.load(MUSIC_GAMEOVER)
@@ -148,6 +156,10 @@ def main():
                     player_data.save()
                     current_state = STATE_MENU
                     game = None
+                    # Retour son du menu
+                    pygame.mixer.music.load(MUSIC_MENU)
+                    pygame.mixer.music.set_volume(0.6)
+                    pygame.mixer.music.play(-1)
                 elif action == "quit":
                     running = False
 
