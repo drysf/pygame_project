@@ -5,9 +5,12 @@ import os
 import pygame
 import random
 import math
-from room_auto import Wall as SpriteWall
 
-ASSETS_ENV_PATH = os.path.join("assets", "Environnement")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ASSETS_ENV_PATH = os.path.join(BASE_DIR, "assets", "Environnement")
+
+def load_image(path):
+    return pygame.image.load(path).convert_alpha()
 
 def load_random_image(subfolder, scale=None):
     """Charge une image aléatoire dans assets/Environnement/<subfolder>"""
@@ -25,15 +28,51 @@ def load_random_image(subfolder, scale=None):
         image = pygame.transform.scale(image, scale)
     return image
 class Wall(pygame.sprite.Sprite):
-    """Mur simple gris"""
-    
-    def __init__(self, x, y, width, height):
+    """Mur ou obstacle basé sur des assets (ou rectangle gris par défaut)."""
+
+    def __init__(self, x, y, width, height, sprite_type=None):
         super().__init__()
-        self.image = pygame.Surface((width, height))
-        self.image.fill((80, 80, 80))
-        pygame.draw.rect(self.image, (60, 60, 60), (0, 0, width, height), 3)
+
+        if sprite_type is not None:
+            self.image = self._load_sprite_type(sprite_type, width, height)
+        else:
+            # mur gris par défaut
+            self.image = pygame.Surface((width, height), pygame.SRCALPHA)
+            self.image.fill((80, 80, 80))
+            pygame.draw.rect(self.image, (60, 60, 60), (0, 0, width, height), 3)
+
         self.rect = self.image.get_rect(topleft=(x, y))
 
+    def _load_sprite_type(self, sprite_type, w, h):
+        # Barils (horizontaux)
+        if sprite_type == "barrel":
+            filename = random.choice(["baril-v1.png", "baril_v2.png"])
+            path = os.path.join(ASSETS_ENV_PATH, "Barils", filename)
+            img = load_image(path)
+            iw, ih = img.get_size()
+            new_h = min(h, ih)
+            new_w = int(iw * (new_h / ih))
+            return pygame.transform.scale(img, (new_w, new_h))
+
+        # Couloirs horizontaux
+        if sprite_type == "c_horizontal":
+            filename = random.choice(["c_horizontal1.png", "c_horizontal2.png"])
+            path = os.path.join(ASSETS_ENV_PATH, "Murs", filename)
+            img = load_image(path)
+            return pygame.transform.scale(img, (w, h))
+
+        # Couloirs verticaux
+        if sprite_type == "c_vertical":
+            filename = random.choice(["c_vertical1.png", "c_vertical2.png"])
+            path = os.path.join(ASSETS_ENV_PATH, "Murs", filename)
+            img = load_image(path)
+            return pygame.transform.scale(img, (w, h))
+
+        # fallback : rectangle gris si sprite_type inconnu
+        surf = pygame.Surface((w, h), pygame.SRCALPHA)
+        surf.fill((80, 80, 80))
+        pygame.draw.rect(surf, (60, 60, 60), (0, 0, w, h), 3)
+        return surf
 
 class Tree(pygame.sprite.Sprite):
     """Arbre décoratif (collision) basé sur un asset"""
