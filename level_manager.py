@@ -44,7 +44,7 @@ class BaseMap:
         self.walls = pygame.sprite.Group()
         self.decorations = pygame.sprite.Group()
         self.ground_color = (40, 40, 45)
-        self.ground_image = None # Image de sol
+        self.ground_image = None  # Image de sol tuile
         self.exterior_zones = []  # Liste de (rect, color) pour zones extérieures
         
         self._create_boundary_walls()
@@ -75,17 +75,14 @@ class BaseMap:
         try:
             asset_path = os.path.join("assets", "Environnement", "Sol", f"sol{level_number}.png")
             if os.path.exists(asset_path):
-                # Charger l'image originale
                 original_image = pygame.image.load(asset_path).convert()
-                
-                # Redimensionner l'image pour créer une tuile
                 self.ground_image = pygame.transform.scale(original_image, (tile_size, tile_size))
-                
                 print(f"✓ Sol niveau {level_number} chargé et redimensionné à {tile_size}x{tile_size}: {asset_path}")
             else:
                 print(f"✗ Image de sol non trouvée: {asset_path}")
         except Exception as e:
             print(f"✗ Erreur chargement sol {level_number}: {e}")
+
 
 class WarehouseMap(BaseMap):
     """Carte: Entrepôt - Zone d'entraînement"""
@@ -95,7 +92,7 @@ class WarehouseMap(BaseMap):
         self.map_width = int(screen_width * 2)
         self.map_height = int(screen_height * 1.5)
         self.ground_color = (50, 45, 40)
-        self._load_ground_image(1) # Charger le sol du niveau 1
+        self._load_ground_image(1)  # Sol niveau 1
 
         # Recréer les murs de bordure avec la bonne taille
         self.walls.empty()
@@ -103,8 +100,7 @@ class WarehouseMap(BaseMap):
         self._create_obstacles()
     
     def _create_obstacles(self):
-        """Crée les obstacles de l'entrepôt"""
-        # Caisses et étagères
+        """Crée les obstacles de l'entrepôt (barils)"""
         crate_positions = [
             (200, 200, 80, 80),
             (400, 150, 60, 60),
@@ -119,11 +115,11 @@ class WarehouseMap(BaseMap):
         
         for x, y, w, h in crate_positions:
             try:
-                crate = Wall(x, y, sprite_type='apocalypse_crate_wood_1')  # ← N'existe PAS !
+                crate = Wall(x, y, w, h, sprite_type="barrel")
                 self.walls.add(crate)
-                print(f"✓ Caisse créée en ({x}, {y})")
+                print(f"✓ Baril créé en ({x}, {y})")
             except Exception as e:
-                print(f"✗ Erreur caisse: {e}")
+                print(f"✗ Erreur baril: {e}")
 
 
 class MilitaryBaseMap(BaseMap):
@@ -134,7 +130,7 @@ class MilitaryBaseMap(BaseMap):
         self.map_width = int(screen_width * 3)
         self.map_height = int(screen_height * 2)
         self.ground_color = (45, 50, 45)
-        self._load_ground_image(2)  # Charge sol niveau 2
+        self._load_ground_image(2)  # Sol niveau 2
 
         self.walls.empty()
         self._create_boundary_walls()
@@ -142,42 +138,20 @@ class MilitaryBaseMap(BaseMap):
     
     def _create_base_layout(self):
         """Crée la disposition de la base militaire"""
-        # Murs intérieurs formant des couloirs
         wall_thickness = 25
         room_w = self.screen_width
         room_h = self.screen_height
         
         # Mur horizontal central avec passage
-        self.walls.add(Wall(0, room_h, room_w - 100, wall_thickness))
-        self.walls.add(Wall(room_w, room_h, self.map_width - room_w, wall_thickness))
-        
-        # Mur vertical
-        self.walls.add(Wall(room_w, 0, wall_thickness, room_h - 100))
-        self.walls.add(Wall(room_w, room_h + 100, wall_thickness, room_h - 100))
-        
+        self.walls.add(Wall(0, room_h, room_w - 100, wall_thickness, sprite_type="c_horizontal"))
+        self.walls.add(Wall(room_w, room_h, self.map_width - room_w, wall_thickness, sprite_type="c_horizontal"))
+
+        # Mur vertical central
+        self.walls.add(Wall(room_w, 0, wall_thickness, room_h - 100, sprite_type="c_vertical"))
+        self.walls.add(Wall(room_w, room_h + 100, wall_thickness, room_h - 100, sprite_type="c_vertical"))
+
         # Mur vertical droit
-        self.walls.add(Wall(2 * room_w, room_h // 2, wall_thickness, room_h))
-        
-        # Obstacles - véhicules militaires (rectangles)
-        vehicles = [
-            (200, 200, 150, 80),
-            (self.map_width - 400, 300, 150, 80),
-            (room_w + 200, room_h + 200, 100, 60),
-            (100, room_h + 300, 120, 70),
-        ]
-        
-        for x, y, w, h in vehicles:
-            vehicle = Wall(x, y, w, h)
-            vehicle.image.fill((60, 80, 60))  # Vert militaire
-            pygame.draw.rect(vehicle.image, (40, 60, 40), (0, 0, w, h), 3)
-            self.walls.add(vehicle)
-        
-        # Barricades
-        for i in range(5):
-            x = 400 + i * 200
-            barricade = Wall(x, room_h - 150, 60, 30)
-            barricade.image.fill((80, 80, 80))
-            self.walls.add(barricade)
+        self.walls.add(Wall(2 * room_w, room_h // 2, wall_thickness, room_h, sprite_type="c_vertical"))
 
 
 class ForestMap(BaseMap):
@@ -187,17 +161,15 @@ class ForestMap(BaseMap):
         super().__init__(screen_width, screen_height)
         self.map_width = int(screen_width * 3)
         self.map_height = int(screen_height * 3)
-        self.ground_color = (34, 85, 34)
-        self._load_ground_image(3)  # Charge sol niveau 3
+        self.ground_color = (0, 0, 0)  # on utilise surtout ground_image
+        self._load_ground_image(3)  # Sol niveau 3
         
         self.walls.empty()
         self._create_boundary_walls()
         self._create_forest()
         
-        # Toute la carte est extérieure
-        self.exterior_zones = [
-            (pygame.Rect(0, 0, self.map_width, self.map_height), (34, 85, 34))
-        ]
+        # Pour la forêt, on ne dessine pas de grand rect vert par-dessus le sol
+        self.exterior_zones = []  
     
     def _create_forest(self):
         """Crée la forêt avec arbres et végétation"""
@@ -257,7 +229,7 @@ class BunkerMap(BaseMap):
         self.map_width = int(screen_width * 2.5)
         self.map_height = int(screen_height * 2)
         self.ground_color = (35, 35, 40)
-        self._load_ground_image(4)  # Charge sol niveau 4
+        self._load_ground_image(4)  # Sol niveau 4
         
         self.walls.empty()
         self._create_boundary_walls()
@@ -267,7 +239,6 @@ class BunkerMap(BaseMap):
         """Crée le labyrinthe du bunker"""
         wall_thickness = 30
         
-        # Labyrinthe de couloirs
         corridors = [
             # Couloirs horizontaux
             (200, 200, 400, wall_thickness),
@@ -305,7 +276,6 @@ class BunkerMap(BaseMap):
     
     def get_spawn_position(self):
         """Retourne une position de spawn dans une zone ouverte"""
-        # Spawn au centre-droit de la carte, zone ouverte entre les murs
         return (self.map_width - 200, self.map_height - 150)
 
 
@@ -317,13 +287,13 @@ class HeadquartersMap(BaseMap):
         self.map_width = int(screen_width * 4)
         self.map_height = int(screen_height * 3)
         self.ground_color = (40, 35, 35)
-        self._load_ground_image(5)  # Charge sol niveau 5
+        self._load_ground_image(5)  # Sol niveau 5
         
         self.walls.empty()
         self._create_boundary_walls()
         self._create_headquarters()
         
-        # Zone extérieure au sud
+        # Zone extérieure au sud (utilisable si tu dessines encore exterior_zones)
         self.exterior_zones = [
             (pygame.Rect(0, self.screen_height * 2, self.map_width, self.screen_height), (46, 80, 46))
         ]
@@ -334,11 +304,9 @@ class HeadquartersMap(BaseMap):
         room_w = self.screen_width
         room_h = self.screen_height
         
-        # Structure de plusieurs salles
-        # Murs horizontaux
+        # Murs horizontaux avec passages
         for row in range(1, 3):
             y = row * room_h
-            # Segments avec passages
             for col in range(4):
                 x_start = col * room_w
                 passage_x = x_start + room_w // 2 - 50
@@ -350,7 +318,7 @@ class HeadquartersMap(BaseMap):
                 if x_start + room_w - passage_end > wall_thickness:
                     self.walls.add(Wall(passage_end, y, x_start + room_w - passage_end, wall_thickness))
         
-        # Murs verticaux
+        # Murs verticaux avec passages
         for col in range(1, 4):
             x = col * room_w
             for row in range(3):
@@ -364,7 +332,7 @@ class HeadquartersMap(BaseMap):
                 if y_start + room_h - passage_end > wall_thickness:
                     self.walls.add(Wall(x, passage_end, wall_thickness, y_start + room_h - passage_end))
         
-        # Obstacles variés dans chaque salle
+        # Obstacles dans les salles
         obstacles = [
             # Salle de commandement (centre)
             (room_w * 2 - 100, room_h - 100, 200, 25),
