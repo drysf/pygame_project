@@ -26,7 +26,7 @@ def main():
     SCREEN_WIDTH = 1024
     SCREEN_HEIGHT = 768
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("Top-Down Shooter - American Soldier")
+    pygame.display.set_caption("PHILADELPHIA LIBERTY")
     
     clock = pygame.time.Clock()
     

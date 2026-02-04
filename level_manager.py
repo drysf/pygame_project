@@ -99,10 +99,12 @@ class WarehouseMap(BaseMap):
         ]
         
         for x, y, w, h in crate_positions:
-            crate = Wall(x, y, w, h)
-            crate.image.fill((139, 90, 43))  # Couleur bois
-            pygame.draw.rect(crate.image, (100, 60, 30), (0, 0, w, h), 3)
-            self.walls.add(crate)
+            try:
+                crate = Wall(x, y, sprite_type='apocalypse_crate_wood_1')  # ← N'existe PAS !
+                self.walls.add(crate)
+                print(f"✓ Caisse créée en ({x}, {y})")
+            except Exception as e:
+                print(f"✗ Erreur caisse: {e}")
 
 
 class MilitaryBaseMap(BaseMap):
