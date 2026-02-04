@@ -9,6 +9,7 @@ import pygame
 
 from game import Game
 from menu import MainMenu, LevelSelectMenu, PauseMenu
+from menu_game_over import GameOverScreen
 from shop import Shop
 from player_data import PlayerData
 
@@ -19,6 +20,8 @@ STATE_LEVEL_SELECT = "level_select"
 STATE_SHOP = "shop"
 STATE_PLAYING = "playing"
 STATE_PAUSED = "paused"
+STATE_GAME_OVER = "game_over"
+
 
 # Audio
 pygame.mixer.init()
@@ -39,8 +42,8 @@ def main():
 
     # Musique du menu au lancement
     pygame.mixer.music.load(MUSIC_MENU)
-    pygame.mixer.music.set_volume(0.6)  # volume menu
-    pygame.mixer.music.play(-1)         # boucle
+    pygame.mixer.music.set_volume(0.6)
+    pygame.mixer.music.play(-1)
 
     clock = pygame.time.Clock()
 
@@ -58,6 +61,8 @@ def main():
     shop.set_player_data(player_data)
 
     pause_menu = PauseMenu(screen)
+    
+    game_over_screen = GameOverScreen(screen)
 
     # État actuel
     current_state = STATE_MENU
@@ -66,7 +71,7 @@ def main():
 
     running = True
     while running:
-        dt = clock.tick(60) / 1000.0  # Delta de temps en secondes
+        dt = clock.tick(60) / 1000.0
 
         # Gestion des événements
         for event in pygame.event.get():
@@ -95,7 +100,6 @@ def main():
                     if current_level:
                         game = Game(screen, current_level, player_data)
                         current_state = STATE_PLAYING
-                        # Musique de jeu en partie
                         pygame.mixer.music.load(MUSIC_GAME)
                         pygame.mixer.music.set_volume(0.8)
                         pygame.mixer.music.play(-1)
@@ -113,7 +117,6 @@ def main():
             elif current_state == STATE_PLAYING:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     current_state = STATE_PAUSED
-                    # Volume réduit en pause
                     pygame.mixer.music.set_volume(0.3)
                     continue
 
@@ -122,7 +125,6 @@ def main():
                     player_data.save()
                     current_state = STATE_MENU
                     game = None
-                    # Retour son du menu
                     pygame.mixer.music.load(MUSIC_MENU)
                     pygame.mixer.music.set_volume(0.6)
                     pygame.mixer.music.play(-1)
@@ -136,31 +138,42 @@ def main():
                     else:
                         current_state = STATE_MENU
                         game = None
-                        # Retour son du menu
                         pygame.mixer.music.load(MUSIC_MENU)
                         pygame.mixer.music.set_volume(0.6)
                         pygame.mixer.music.play(-1)
-                elif result == "game_over":
-                    # Musique de game over (suppose que Game renvoie "game_over")
-                    pygame.mixer.music.load(MUSIC_GAMEOVER)
-                    pygame.mixer.music.set_volume(0.8)
-                    pygame.mixer.music.play()
 
             elif current_state == STATE_PAUSED:
                 action = pause_menu.handle_event(event)
                 if action == "resume":
                     current_state = STATE_PLAYING
-                    # Volume normal en jeu
                     pygame.mixer.music.set_volume(0.8)
                 elif action == "menu":
                     player_data.save()
                     current_state = STATE_MENU
                     game = None
-                    # Retour son du menu
                     pygame.mixer.music.load(MUSIC_MENU)
                     pygame.mixer.music.set_volume(0.6)
                     pygame.mixer.music.play(-1)
                 elif action == "quit":
+                    running = False
+
+            elif current_state == STATE_GAME_OVER:
+                action = game_over_screen.handle_input(event)
+                if action == "RETRY":
+                    if game:
+                        game._restart_game()
+                        current_state = STATE_PLAYING
+                        pygame.mixer.music.load(MUSIC_GAME)
+                        pygame.mixer.music.set_volume(0.8)
+                        pygame.mixer.music.play(-1)
+                elif action == "MAIN MENU":
+                    player_data.save()
+                    current_state = STATE_MENU
+                    game = None
+                    pygame.mixer.music.load(MUSIC_MENU)
+                    pygame.mixer.music.set_volume(0.6)
+                    pygame.mixer.music.play(-1)
+                elif action == "QUIT":
                     running = False
 
         # Updates selon l'état
@@ -172,8 +185,21 @@ def main():
             shop.update(dt)
         elif current_state == STATE_PLAYING and game:
             game.update(dt)
+
+            # Vérifier le game over après l'update
+            if game.game_over and current_state == STATE_PLAYING:
+                print("GAME OVER DETECTE!")  # DEBUG
+                  
+                print("CHANGEMENT VERS STATE_GAME_OVER")  # DEBUG
+                current_state = STATE_GAME_OVER
+                pygame.mixer.music.load(MUSIC_GAMEOVER)
+                pygame.mixer.music.set_volume(0.8)
+                pygame.mixer.music.play(0)
         elif current_state == STATE_PAUSED:
             pause_menu.update(dt)
+        elif current_state == STATE_GAME_OVER:
+            print(f"Dans STATE_GAME_OVER, running={running}")  # DEBUG
+            game_over_screen.update()
 
         # Rendu selon l'état
         if current_state == STATE_MENU:
@@ -188,6 +214,10 @@ def main():
             if game:
                 game.draw()
             pause_menu.draw()
+        elif current_state == STATE_GAME_OVER:
+            if game:
+                game.draw()
+            game_over_screen.draw()
 
         pygame.display.flip()
 

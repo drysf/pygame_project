@@ -5,7 +5,7 @@ import pygame
 import random
 import math
 from player import Player
-from enemy import Enemy, EliteEnemy  # Ajout de EliteEnemy
+from enemy import Enemy, EliteEnemy
 from bullet import Bullet
 from camera import Camera
 from level_manager import LevelManager
@@ -17,13 +17,11 @@ class HealthPack(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.pos = pygame.math.Vector2(x, y)
-        self.heal_amount = 30  # Points de vie restaurés
+        self.heal_amount = 30
         
-        # Animation
         self.pulse_timer = 0
         self.size = 12
         
-        # Création de l'image
         self.image = pygame.Surface((30, 30), pygame.SRCALPHA)
         self.rect = self.image.get_rect(center=(x, y))
         self._draw_pack()
@@ -33,17 +31,12 @@ class HealthPack(pygame.sprite.Sprite):
         self.image.fill((0, 0, 0, 0))
         center = (15, 15)
         
-        # Effet de pulsation
         pulse = 1 + 0.2 * math.sin(self.pulse_timer)
         size = int(self.size * pulse)
         
-        # Halo lumineux
         pygame.draw.circle(self.image, (255, 100, 100, 100), center, size + 5)
-        
-        # Fond du pack
         pygame.draw.circle(self.image, (200, 50, 50), center, size)
         
-        # Croix blanche
         cross_w = size // 2
         cross_h = 3
         pygame.draw.rect(self.image, (255, 255, 255), 
@@ -51,7 +44,6 @@ class HealthPack(pygame.sprite.Sprite):
         pygame.draw.rect(self.image, (255, 255, 255), 
                         (center[0] - cross_h, center[1] - cross_w, cross_h * 2, cross_w * 2))
         
-        # Contour
         pygame.draw.circle(self.image, (255, 255, 255), center, size, 2)
     
     def update(self, dt):
@@ -68,16 +60,13 @@ class Game:
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
 
-        # Configuration du niveau
         self.level_config = level_config or {"name": "Default", "enemies": 20, "map_type": "warehouse"}
         self.player_data = player_data
 
-        # Statistiques de la partie
         self.kills = 0
         self.gold_earned = 0
         self.gold_per_kill = 25
 
-        # Groupes de sprites
         self.all_sprites = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.player_bullets = pygame.sprite.Group()
@@ -86,7 +75,6 @@ class Game:
         self.decorations = pygame.sprite.Group()
         self.health_packs = pygame.sprite.Group()
 
-        # Création du niveau
         level_manager = LevelManager(self.screen_width, self.screen_height)
         self.current_map = level_manager.create_level(self.level_config)
 
@@ -94,11 +82,9 @@ class Game:
         self.all_sprites.add(self.current_map.walls)
         self.decorations.add(self.current_map.decorations)
 
-        # Création de la caméra
         self.camera = Camera(self.screen_width, self.screen_height,
                             self.current_map.map_width, self.current_map.map_height)
 
-        # Création du joueur
         spawn_pos = self.current_map.get_spawn_position()
         owned_weapons = None
         if self.player_data:
@@ -106,24 +92,19 @@ class Game:
         self.player = Player(spawn_pos[0], spawn_pos[1], owned_weapons)
         self.all_sprites.add(self.player)
 
-        # Création des ennemis (avec élites)
         enemy_count = self.level_config.get("enemies", 20)
         self._spawn_enemies(enemy_count)
 
-        # Police pour le HUD
         self.font = pygame.font.Font(None, 36)
         self.small_font = pygame.font.Font(None, 24)
 
-        # État du jeu
         self.game_over = False
         self.victory = False
 
-        # Notifications
         self.gold_notifications = []
         self.heal_notifications = []
 
-        # Paramètres des power-ups (chance de drop pour les élites)
-        self.health_pack_drop_chance = 0.6  # 60% de chance pour les élites
+        self.health_pack_drop_chance = 0.6
 
     def _spawn_enemies(self, count):
         """Fait apparaître des ennemis répartis sur toute la carte (avec élites)"""
@@ -139,7 +120,6 @@ class Game:
                            (y - self.player.pos.y) ** 2) ** 0.5
 
                 if distance > 300:
-                    # Créer un élite tous les 5 ennemis
                     if (i + 1) % 5 == 0:
                         enemy = EliteEnemy(x, y)
                     else:
@@ -164,8 +144,6 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     self._restart_game()
-                elif event.key == pygame.K_m:
-                    return "menu"
             return None
 
         if self.victory:
@@ -178,7 +156,7 @@ class Game:
 
         self.player.handle_weapon_switch(event)
         return None
-
+    
     def update(self, dt):
         """Met à jour tous les éléments du jeu"""
         if self.game_over or self.victory:
@@ -212,7 +190,6 @@ class Game:
                     self.player_bullets.add(bullet)
                     self.all_sprites.add(bullet)
 
-        # Mise à jour des ennemis
         for enemy in self.enemies:
             enemy.update(dt, self.player.pos, self.walls)
 
@@ -221,7 +198,6 @@ class Game:
                 self.enemy_bullets.add(bullet)
                 self.all_sprites.add(bullet)
 
-        # Mise à jour des balles du joueur
         for bullet in list(self.player_bullets):
             bullet.update(dt)
 
@@ -237,7 +213,6 @@ class Game:
                         self._on_enemy_killed(enemy)
                         enemy.kill()
 
-        # Mise à jour des balles ennemies
         for bullet in list(self.enemy_bullets):
             bullet.update(dt)
 
@@ -252,20 +227,16 @@ class Game:
                     if self.player_data:
                         self.player_data.record_death()
 
-        # Mise à jour des power-ups de vie
         for health_pack in self.health_packs:
             health_pack.update(dt)
 
-        # Collision joueur avec les power-ups
         collected_packs = pygame.sprite.spritecollide(self.player, self.health_packs, True)
         for pack in collected_packs:
             self._on_health_pack_collected(pack)
 
-        # Mettre à jour les notifications
         self._update_gold_notifications(dt)
         self._update_heal_notifications(dt)
 
-        # Vérifier la victoire
         if len(self.enemies) == 0 and not self.victory:
             self.victory = True
             self._on_level_complete()
@@ -294,7 +265,6 @@ class Game:
 
             if notif['timer'] <= 0:
                 self.heal_notifications.remove(notif)
-
     def draw(self):
         """Dessine tous les éléments du jeu"""
         self.screen.fill((40, 40, 45))
@@ -307,7 +277,6 @@ class Game:
                screen_rect.bottom > 0 and screen_rect.top < self.screen_height:
                 self.screen.blit(decoration.image, screen_rect)
 
-        # Dessiner les power-ups
         for health_pack in self.health_packs:
             screen_rect = self.camera.apply(health_pack)
             if screen_rect.right > 0 and screen_rect.left < self.screen_width and \
@@ -324,13 +293,9 @@ class Game:
             enemy.draw_health_bar(self.screen, self.camera)
 
         self._draw_hud()
-
-        # Dessiner les notifications de soin (en vert)
         self._draw_heal_notifications()
 
-        if self.game_over:
-            self._draw_game_over()
-        elif self.victory:
+        if self.victory:
             self._draw_victory()
 
     def _draw_heal_notifications(self):
@@ -346,9 +311,7 @@ class Game:
         ground_rect = pygame.Rect(0, 0, self.current_map.map_width, self.current_map.map_height)
         screen_rect = self.camera.apply_rect(ground_rect)
         
-        # Utiliser l'image si disponible, sinon la couleur
         if hasattr(self.current_map, 'ground_image') and self.current_map.ground_image:
-            # Répéter l'image en tuiles pour couvrir toute la carte
             tile_width = self.current_map.ground_image.get_width()
             tile_height = self.current_map.ground_image.get_height()
             
@@ -356,20 +319,18 @@ class Game:
                 for y in range(0, self.current_map.map_height, tile_height):
                     tile_rect = pygame.Rect(x, y, tile_width, tile_height)
                     screen_tile_rect = self.camera.apply_rect(tile_rect)
-                    # Optimisation : ne dessiner que si visible à l'écran
                     if screen_tile_rect.colliderect(pygame.Rect(0, 0, self.screen_width, self.screen_height)):
                         self.screen.blit(self.current_map.ground_image, screen_tile_rect)
         elif hasattr(self.current_map, 'ground_color'):
-            # Fallback sur la couleur si pas d'image
             pygame.draw.rect(self.screen, self.current_map.ground_color, screen_rect)
         
-        # Zones extérieures spécifiques (ForestMap et HeadquartersMap)
         if hasattr(self.current_map, 'exterior_zones'):
             for zone_rect, color in self.current_map.exterior_zones:
                 screen_rect = self.camera.apply_rect(zone_rect)
                 if screen_rect.right > 0 and screen_rect.left < self.screen_width and \
                    screen_rect.bottom > 0 and screen_rect.top < self.screen_height:
                     pygame.draw.rect(self.screen, color, screen_rect)
+
     def _draw_hud(self):
         """Dessine l'interface utilisateur"""
         hud_bg = pygame.Surface((220, 200))
@@ -377,7 +338,7 @@ class Game:
         hud_bg.fill((0, 0, 0))
         self.screen.blit(hud_bg, (5, 5))
 
-        level_name = self.level_config.get("name", "Mission")
+        level_name = self.        level_name = self.level_config.get("name", "Mission")
         level_text = self.small_font.render(level_name, True, (255, 215, 0))
         self.screen.blit(level_text, (10, 10))
 
@@ -442,7 +403,6 @@ class Game:
             h = max(1, int(wall.rect.height * scale_y))
             pygame.draw.rect(minimap, (80, 80, 80), (x, y, w, h))
 
-        # Afficher les power-ups sur la minimap (en rouge clair)
         for pack in self.health_packs:
             x = int(pack.pos.x * scale_x)
             y = int(pack.pos.y * scale_y)
@@ -451,7 +411,6 @@ class Game:
         for enemy in self.enemies:
             x = int(enemy.pos.x * scale_x)
             y = int(enemy.pos.y * scale_y)
-            # Élites en orange sur la minimap
             if isinstance(enemy, EliteEnemy):
                 pygame.draw.circle(minimap, (255, 150, 0), (x, y), 3)
             else:
@@ -470,32 +429,6 @@ class Game:
         self.screen.blit(minimap, (minimap_x, minimap_y))
         pygame.draw.rect(self.screen, (100, 100, 100), 
                         (minimap_x, minimap_y, minimap_width, minimap_height), 2)
-
-    def _draw_game_over(self):
-        """Dessine l'écran de game over"""
-        overlay = pygame.Surface((self.screen_width, self.screen_height))
-        overlay.set_alpha(128)
-        overlay.fill((0, 0, 0))
-        self.screen.blit(overlay, (0, 0))
-
-        game_over_text = self.font.render("GAME OVER", True, (255, 0, 0))
-        kills_text = self.font.render(f"Ennemis tués: {self.kills}", True, (255, 255, 255))
-        gold_text = self.font.render(f"Or conservé: ${self.gold_earned // 2}", True, (255, 215, 0))
-        restart_text = self.small_font.render("[R] Recommencer  |  [M] Menu", True, (200, 200, 200))
-
-        text_rect = game_over_text.get_rect(center=(self.screen_width // 2, 
-                                                     self.screen_height // 2 - 80))
-        kills_rect = kills_text.get_rect(center=(self.screen_width // 2, 
-                                                  self.screen_height // 2 - 20))
-        gold_rect = gold_text.get_rect(center=(self.screen_width // 2, 
-                                                self.screen_height // 2 + 20))
-        restart_rect = restart_text.get_rect(center=(self.screen_width // 2, 
-                                                      self.screen_height // 2 + 80))
-
-        self.screen.blit(game_over_text, text_rect)
-        self.screen.blit(kills_text, kills_rect)
-        self.screen.blit(gold_text, gold_rect)
-        self.screen.blit(restart_text, restart_rect)
 
     def _draw_victory(self):
         """Dessine l'écran de victoire"""
@@ -573,7 +506,6 @@ class Game:
         """Appelé quand un ennemi est tué"""
         self.kills += 1
         
-        # Or selon type d'ennemi (élites donnent plus)
         gold = getattr(enemy, 'gold_reward', self.gold_per_kill)
         self.gold_earned += gold
 
@@ -585,7 +517,6 @@ class Game:
             'alpha': 255
         })
 
-        # SEULEMENT les élites peuvent drop des power-ups
         if isinstance(enemy, EliteEnemy):
             if random.random() < self.health_pack_drop_chance:
                 self._spawn_health_pack(enemy.pos.x, enemy.pos.y)

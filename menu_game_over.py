@@ -679,8 +679,20 @@ class GameOverScreen:
                 self.selected = (self.selected + 1) % len(self.options)
             elif event.key == pygame.K_RETURN:
                 return self.options[self.selected]
-        return None
 
+        elif event.type == pygame.MOUSEMOTION:
+            mouse_x, mouse_y = event.pos
+            # Vérifier quelle option est survolée
+            for i in range(len(self.options)):
+                option_y = 60 + 425 + i * 45  # panel_y + position initiale + espacement
+                # Zone cliquable de chaque option
+                if (512 - 140 < mouse_x < 512 + 140 and  # SCREEN_WIDTH // 2 ± 140
+                    option_y - 25 < mouse_y < option_y + 25):
+                    self.selected = i
+    
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:  # Clic gauche
+                return self.options[self.selected]
 
 def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
