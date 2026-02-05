@@ -826,7 +826,7 @@ class MainMenu:
         self.font_small = pygame.font.Font(None, 35)
         
         # Options du menu
-        self.options = ["NOUVELLE PARTIE", "BOUTIQUE", "CREDITS", "QUITTER"]
+        self.options = ["NOUVELLE PARTIE", "BOUTIQUE", "REGLES", "QUITTER"]
         self.selected = 0
         
         # Éléments animés
@@ -1243,8 +1243,8 @@ class MainMenu:
             return "play"
         elif option == "BOUTIQUE":
             return "shop"
-        elif option == "CREDITS":
-            return "credits"
+        elif option == "REGLES":
+            return "rules"
         elif option == "QUITTER":
             return "quit"
         return None
@@ -1604,3 +1604,151 @@ class PauseMenu:
                 for dx, dy in [(-2, -2), (2, -2), (-2, 2), (2, 2)]:
                     self.screen.blit(outline_option, (option_rect.x + dx, option_rect.y + dy))
                 self.screen.blit(option_surf, option_rect)
+
+class RulesMenu:
+    """Menu des règles du jeu"""
+    
+    def __init__(self, screen):
+        self.screen = screen
+        self.screen_width = screen.get_width()
+        self.screen_height = screen.get_height()
+        
+        # Polices
+        self.font_title = pygame.font.Font(None, 70)
+        self.font_text = pygame.font.Font(None, 32)
+        self.font_small = pygame.font.Font(None, 28)
+        
+        # Contenu des règles
+        self.rules_lines = [
+            "",
+            "REGLES DU JEU",
+            "",
+            "Deplacement du personnage :",
+            "  - Utilise soit les touches ZQSD,",
+            "    soit les fleches directionnelles.",
+            "",
+            "Tir :",
+            "  - Clique avec le bouton gauche de la souris pour tirer.",
+            "  - La balle part dans la direction indiquée",
+            "    par la position de la souris par rapport au personnage.",
+            "",
+            "Objectif :",
+            "  - Elimine tous les soldats anglais pour déclarer l'indépendance !",
+            "",
+        ]
+        
+        self.time = 0
+        self.back_button = Button(
+            self.screen_width // 2 - 100, 
+            self.screen_height - 90, 
+            200, 60, 
+            "RETOUR",
+            color=COLORS['colonial_blue'], 
+            hover_color=(50, 80, 130)
+        )
+    
+    def update(self, dt):
+        """Met à jour le menu"""
+        self.time += 0.02
+        mouse_pos = pygame.mouse.get_pos()
+        self.back_button.update(mouse_pos)
+    
+    def handle_event(self, event):
+        """Gère les événements"""
+        if self.back_button.is_clicked(event):
+            return "back"
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE or event.key == pygame.K_RETURN:
+                return "back"
+        
+        return None
+    
+    def draw(self):
+        """Dessine le menu des règles"""
+        # Fond avec dégradé parchemin
+        for y in range(self.screen_height):
+            ratio = y / self.screen_height
+            r = int(COLORS['parchment'][0] * (1 - ratio * 0.25))
+            g = int(COLORS['parchment'][1] * (1 - ratio * 0.25))
+            b = int(COLORS['parchment'][2] * (1 - ratio * 0.25))
+            pygame.draw.line(self.screen, (r, g, b), (0, y), (self.screen_width, y))
+        
+        # Panneau central
+        panel_width = 800
+        panel_height = 550
+        panel_x = self.screen_width // 2 - panel_width // 2
+        panel_y = 80
+        
+        panel_surf = pygame.Surface((panel_width, panel_height), pygame.SRCALPHA)
+        panel_surf.fill((*COLORS['cream'], 250))
+        
+        # Bordures dorées
+        for i in range(3):
+            thickness = 10 - i * 2
+            offset = i * 3
+            pygame.draw.rect(panel_surf, COLORS['warm_gold'],
+                           (offset, offset, panel_width - 2 * offset, panel_height - 2 * offset), 
+                           thickness)
+        
+        self.screen.blit(panel_surf, (panel_x, panel_y))
+        
+        # Étoiles dans les coins
+        corner_positions = [
+            (panel_x + 30, panel_y + 30),
+            (panel_x + panel_width - 30, panel_y + 30),
+            (panel_x + 30, panel_y + panel_height - 30),
+            (panel_x + panel_width - 30, panel_y + panel_height - 30)
+        ]
+        
+        for corner_x, corner_y in corner_positions:
+            star_points = []
+            for i in range(16):
+                angle = i * math.pi / 8 + self.time * 2
+                radius = 15 if i % 2 == 0 else 7
+                sx = corner_x + math.cos(angle) * radius
+                sy = corner_y + math.sin(angle) * radius
+                star_points.append((sx, sy))
+            pygame.draw.polygon(self.screen, COLORS['warm_gold'], star_points)
+            pygame.draw.polygon(self.screen, COLORS['brass'], star_points, 2)
+        
+        # Affichage du texte des règles
+        y_offset = panel_y + 50
+        
+        for i, line in enumerate(self.rules_lines):
+            if i == 1:  # Titre "REGLES DU JEU"
+                title_surf = self.font_title.render(line, True, COLORS['deep_red'])
+                title_rect = title_surf.get_rect(center=(self.screen_width // 2, y_offset))
+                
+                # Contour doré du titre
+                outline_surf = self.font_title.render(line, True, COLORS['warm_gold'])
+                for dx, dy in [(-2, -2), (2, -2), (-2, 2), (2, 2)]:
+                    self.screen.blit(outline_surf, (title_rect.x + dx, title_rect.y + dy))
+                self.screen.blit(title_surf, title_rect)
+                
+                # Ligne décorative sous le titre
+                line_y = y_offset + 35
+                pygame.draw.line(self.screen, COLORS['warm_gold'],
+                               (panel_x + 80, line_y), 
+                               (panel_x + panel_width - 80, line_y), 4)
+                y_offset += 60
+            elif line.startswith("  "):  # Sous-points (indentés)
+                text_surf = self.font_small.render(line, True, COLORS['shadow'])
+                self.screen.blit(text_surf, (panel_x + 120, y_offset))
+                y_offset += 35
+            elif line and not line.startswith(" "):  # Sections principales
+                text_surf = self.font_text.render(line, True, COLORS['colonial_blue'])
+                text_rect = text_surf.get_rect(x=panel_x + 80, y=y_offset)
+                
+                # Petite bordure pour les sections
+                outline = self.font_text.render(line, True, COLORS['warm_gold'])
+                for dx, dy in [(-1, -1), (1, -1), (-1, 1), (1, 1)]:
+                    self.screen.blit(outline, (text_rect.x + dx, text_rect.y + dy))
+                
+                self.screen.blit(text_surf, text_rect)
+                y_offset += 45
+            else:  # Lignes vides
+                y_offset += 25
+        
+        # Bouton retour
+        self.back_button.draw(self.screen)

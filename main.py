@@ -8,7 +8,7 @@ import sys
 import pygame
 
 from game import Game
-from menu import MainMenu, LevelSelectMenu, PauseMenu
+from menu import MainMenu, LevelSelectMenu, PauseMenu, RulesMenu
 from menu_game_over import GameOverScreen
 from menu_win import WinScreen
 from shop import Shop
@@ -19,6 +19,7 @@ from player_data import PlayerData
 STATE_MENU = "menu"
 STATE_LEVEL_SELECT = "level_select"
 STATE_SHOP = "shop"
+STATE_RULES = "rules"
 STATE_PLAYING = "playing"
 STATE_PAUSED = "paused"
 STATE_WIN = "win"
@@ -63,6 +64,8 @@ def main():
     shop = Shop(screen)
     shop.set_player_data(player_data)
 
+    rules_menu = RulesMenu(screen)
+
     pause_menu = PauseMenu(screen)
     
     game_over_screen = GameOverScreen(screen)
@@ -97,6 +100,8 @@ def main():
                     current_state = STATE_LEVEL_SELECT
                 elif action == "quit":
                     running = False
+                elif action == "rules":
+                    current_state = STATE_RULES
 
             elif current_state == STATE_LEVEL_SELECT:
                 action = level_select.handle_event(event)
@@ -120,6 +125,10 @@ def main():
                     current_state = STATE_MENU
                 elif action == "purchased":
                     player_data.save()
+            elif current_state == STATE_RULES:
+                action = rules_menu.handle_event(event)
+                if action == "back":
+                    current_state = STATE_MENU
 
             elif current_state == STATE_PLAYING:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -219,6 +228,8 @@ def main():
             level_select.update(dt)
         elif current_state == STATE_SHOP:
             shop.update(dt)
+        elif current_state == STATE_RULES:
+            rules_menu.update(dt)
         elif current_state == STATE_PLAYING and game:
             game.update(dt)
 
@@ -269,6 +280,8 @@ def main():
             if game:
                 game.draw()
             win_screen.draw()
+        elif current_state == STATE_RULES:
+            rules_menu.draw()
 
         pygame.display.flip()
 
