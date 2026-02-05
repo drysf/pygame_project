@@ -1,13 +1,19 @@
-"""Philladelphia Liberty Main"""
+"""
+Philladelphia Liberty
+Incarnez un soldat de la révolution américaine et combattez les anglais
+pour déclarer l'indépendance des États-Unis !
+"""
 
 import sys
 import pygame
+
 from game import Game
 from menu import MainMenu, LevelSelectMenu, PauseMenu
 from menu_game_over import GameOverScreen
 from menu_win import WinScreen
 from shop import Shop
 from player_data import PlayerData
+
 
 # États du jeu
 STATE_MENU = "menu"
@@ -17,6 +23,7 @@ STATE_PLAYING = "playing"
 STATE_PAUSED = "paused"
 STATE_WIN = "win"
 STATE_GAME_OVER = "game_over"
+
 
 # Audio
 pygame.mixer.init()
@@ -111,9 +118,6 @@ def main():
                 if action == "back":
                     player_data.save()
                     current_state = STATE_MENU
-                    pygame.mixer.music.load(MUSIC_MENU)
-                    pygame.mixer.music.set_volume(0.6)
-                    pygame.mixer.music.play(-1)
                 elif action == "purchased":
                     player_data.save()
 
@@ -220,7 +224,9 @@ def main():
 
             # Vérifier le game over après l'update
             if game.game_over and current_state == STATE_PLAYING:
-
+                print("GAME OVER DETECTE!")  # DEBUG
+                  
+                print("CHANGEMENT VERS STATE_GAME_OVER")  # DEBUG
                 current_state = STATE_GAME_OVER
                 pygame.mixer.music.load(MUSIC_GAMEOVER)
                 pygame.mixer.music.set_volume(0.8)
@@ -228,6 +234,7 @@ def main():
             
             # Vérifier la victoire après l'update
             if game.victory and current_state == STATE_PLAYING:
+                print("VICTOIRE DETECTEE!")  # DEBUG
                 current_state = STATE_WIN
                 pygame.mixer.music.load(MUSIC_WIN)
                 pygame.mixer.music.set_volume(0.8)
@@ -238,6 +245,7 @@ def main():
         elif current_state == STATE_WIN:
             win_screen.update()
         elif current_state == STATE_GAME_OVER:
+            print(f"Dans STATE_GAME_OVER, running={running}")  # DEBUG
             game_over_screen.update()
 
         # Rendu selon l'état
@@ -268,6 +276,7 @@ def main():
     player_data.save()
     pygame.quit()
     sys.exit()
+
 
 if __name__ == "__main__":
     main()
