@@ -1,3 +1,0 @@
-([('main',
-   '/Users/tamotaki/Documents/GitHub/pygame_project/dist/main',
-   'EXECUTABLE')],)
