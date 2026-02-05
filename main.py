@@ -31,6 +31,7 @@ MUSIC_MENU = "assets/Sons/son_accueil.mp3"
 MUSIC_GAME = "assets/Sons/audio_en_jeu.mp3"
 MUSIC_GAMEOVER = "assets/Sons/gameover.mp3"
 MUSIC_WIN = "assets/Sons/victoire.mp3"
+MUSIC_SHOP = "assets/Sons/shop_music.mp3" 
 
 def main():
     """Configuration principale du jeu."""
@@ -90,6 +91,8 @@ def main():
                     current_state = STATE_LEVEL_SELECT
                 elif action == "shop":
                     current_state = STATE_SHOP
+                    pygame.mixer.music.load(MUSIC_SHOP)
+                    pygame.mixer.music.play(-1)
                 elif action == "levels":
                     current_state = STATE_LEVEL_SELECT
                 elif action == "quit":
@@ -115,6 +118,9 @@ def main():
                 if action == "back":
                     player_data.save()
                     current_state = STATE_MENU
+                    pygame.mixer.music.load(MUSIC_MENU)
+                    pygame.mixer.music.set_volume(0.6)
+                    pygame.mixer.music.play(-1)
                 elif action == "purchased":
                     player_data.save()
 
