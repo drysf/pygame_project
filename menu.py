@@ -1275,17 +1275,18 @@ class LevelSelectMenu:
         
         # Définition des niveaux
         self.levels = [
-            {"name": "Fort Bragg", "description": "Zone d'entraînement - 10 ennemis", 
-             "enemies": 10, "unlocked": True, "map_type": "warehouse"},
-            {"name": "Camp Pendleton", "description": "Difficulté moyenne - 20 ennemis", 
-             "enemies": 20, "unlocked": True, "map_type": "military"},
-            {"name": "Forêt du Vietnam", "description": "Guerre de jungle - 25 ennemis", 
-             "enemies": 25, "unlocked": False, "required_gold": 500, "map_type": "forest"},
-            {"name": "Bunker de Normandie", "description": "Combat rapproché - 30 ennemis", 
-             "enemies": 30, "unlocked": False, "required_gold": 1000, "map_type": "bunker"},
-            {"name": "QG Ennemi", "description": "Mission finale - 40 ennemis", 
-             "enemies": 40, "unlocked": False, "required_gold": 2000, "map_type": "headquarters"},
-        ]
+            {"name": "Camp de Lexington", "description": "Zone d'entraînement - 10 ennemis", 
+            "enemies": 10, "unlocked": True, "map_type": "warehouse"},
+            {"name": "Fort Ticonderoga", "description": "Base militaire - 20 ennemis", 
+            "enemies": 20, "unlocked": True, "map_type": "military"},
+            {"name": "Forêt de Saratoga", "description": "Bataille tournante - 25 ennemis", 
+            "enemies": 25, "unlocked": False, "required_gold": 500, "map_type": "forest"},
+            {"name": "Bunker de Yorktown", "description": "Siège décisif - 30 ennemis", 
+            "enemies": 30, "unlocked": False, "required_gold": 1000, "map_type": "bunker"},
+            {"name": "QG de Washington", "description": "Mission finale - 40 ennemis", 
+            "enemies": 40, "unlocked": False, "required_gold": 2000, "map_type": "headquarters"},
+]
+
         
         self.level_buttons = []
         self._create_level_buttons()

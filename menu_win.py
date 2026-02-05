@@ -410,15 +410,10 @@ class WinScreen:
             )
 
         quote_y = panel_y + 310
-        quote_text = '"Le futur appartient aux libres."'
+        quote_text = "Le futur appartient aux libres."
         quote_surf = self.font_small.render(quote_text, True, COLORS['shadow'])
         quote_rect = quote_surf.get_rect(center=(SCREEN_WIDTH // 2, quote_y))
         self.screen.blit(quote_surf, quote_rect)
-
-        author_text = "- Patriote anonyme"
-        author_surf = self.font_small.render(author_text, True, COLORS['shadow'])
-        author_rect = author_surf.get_rect(center=(SCREEN_WIDTH // 2, quote_y + 35))
-        self.screen.blit(author_surf, author_rect)
 
         # Options
         for i, option in enumerate(self.options):
@@ -501,7 +496,7 @@ class WinScreen:
 
 def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("🎖️ PHILADELPHIA LIBERTY - VICTOIRE 🎖️")
+    pygame.display.set_caption("PHILADELPHIA LIBERTY - VICTOIRE")
     win_screen = WinScreen(screen)
     running = True
     clock = pygame.time.Clock()
@@ -514,11 +509,11 @@ def main():
                 running = False
             action = win_screen.handle_input(event)
             if action == "NIVEAU SUIVANT":
-                print("➡ Prochain niveau sélectionné.")
+                print("Prochain niveau sélectionné.")
             elif action == "MENU PRINCIPAL":
-                print("📜 Retour au menu principal.")
+                print("Retour au menu principal.")
             elif action == "QUITTER":
-                print("🏆 Mission accomplie, fermeture du jeu.")
+                print("Mission accomplie, fermeture du jeu.")
                 running = False
 
         win_screen.update()

@@ -294,61 +294,69 @@ class TatteredFlag:
     def draw(self, screen):
         pole_x = self.x + self.sway * 20
         pole_height = 180
-        
+
+        # Mât
         pygame.draw.rect(screen, COLORS['dark_wood'],
-                        (int(pole_x - 3), self.y, 6, pole_height))
-        
+                         (int(pole_x - 3), self.y, 6, pole_height))
+
         flag_width = 90
         flag_height = 60
-        stripe_height = flag_height // 13
-        
         flag_surf = pygame.Surface((flag_width, flag_height), pygame.SRCALPHA)
-        
-        for i in range(13):
-            color = COLORS['blood_red'] if i % 2 == 0 else COLORS['parchment_old']
-            y_pos = i * stripe_height
-            
-            for x in range(flag_width):
-                if random.random() > 0.95:
-                    continue
-                
-                wave = math.sin(self.wave_phase + x * 0.1 + self.sway) * 4
-                if x < flag_width - 10 or random.random() > 0.3:
-                    pygame.draw.line(flag_surf, color,
-                                   (x, int(y_pos + wave)),
-                                   (x, int(y_pos + stripe_height + wave)))
-        
-        canton_width = flag_width // 2
-        canton_height = 7 * stripe_height
-        
-        for x in range(canton_width):
-            for y in range(canton_height):
-                if random.random() > 0.92:
-                    continue
-                wave = math.sin(self.wave_phase + x * 0.1 + self.sway) * 4
-                flag_surf.set_at((x, int(y + wave)), COLORS['colonial_blue'])
-        
-        for row in range(2):
-            for col in range(3):
-                if random.random() > 0.7:
-                    sx = col * 25 + 12
-                    sy = row * 20 + 15
-                    star_points = []
-                    for i in range(10):
-                        angle = i * 2 * math.pi / 10
-                        radius = 5 if i % 2 == 0 else 2
-                        px = sx + math.cos(angle) * radius
-                        py = sy + math.sin(angle) * radius
-                        star_points.append((int(px), int(py)))
-                    
-                    for px, py in star_points:
-                        if 0 <= px < canton_width and 0 <= py < canton_height:
-                            wave = int(math.sin(self.wave_phase + px * 0.1 + self.sway) * 4)
-                            if 0 <= py + wave < flag_height:
-                                flag_surf.set_at((px, py + wave), COLORS['parchment_old'])
-        
-        screen.blit(flag_surf, (int(pole_x + 5), self.y + 30))
 
+        # Fond bleu
+        flag_surf.fill((0, 40, 104))  # bleu sombre façon Union Jack
+
+        # Fonction helper pour appliquer la vague/déchirure
+        def wavy_y(x, y):
+            wave = math.sin(self.wave_phase + x * 0.12 + self.sway) * 4
+            # petite "déchirure" sur le bord droit
+            if x > flag_width - 10 and random.random() < 0.25:
+                return None
+            return int(y + wave)
+
+        # Croix diagonales blanches
+        diag_thick = 10
+        for x in range(flag_width):
+            for y in range(flag_height):
+                # deux diagonales principales (x ~ y) et (x ~ width - y)
+                if abs(y - (x * flag_height / flag_width)) < diag_thick or \
+                   abs(y - (flag_height - x * flag_height / flag_width)) < diag_thick:
+                    wy = wavy_y(x, y)
+                    if wy is not None and 0 <= wy < flag_height:
+                        flag_surf.set_at((x, wy), (255, 255, 255))
+
+        # Croix diagonales rouges plus fines
+        diag_thick_red = 4
+        for x in range(flag_width):
+            for y in range(flag_height):
+                if abs(y - (x * flag_height / flag_width)) < diag_thick_red or \
+                   abs(y - (flag_height - x * flag_height / flag_width)) < diag_thick_red:
+                    wy = wavy_y(x, y)
+                    if wy is not None and 0 <= wy < flag_height:
+                        flag_surf.set_at((x, wy), (200, 0, 0))
+
+        # Croix centrale blanche
+        cross_w = 10
+        for x in range(flag_width):
+            for y in range(flag_height):
+                if abs(x - flag_width // 2) < cross_w // 2 or \
+                   abs(y - flag_height // 2) < cross_w // 2:
+                    wy = wavy_y(x, y)
+                    if wy is not None and 0 <= wy < flag_height:
+                        flag_surf.set_at((x, wy), (255, 255, 255))
+
+        # Croix centrale rouge plus fine
+        cross_w_red = 4
+        for x in range(flag_width):
+            for y in range(flag_height):
+                if abs(x - flag_width // 2) < cross_w_red // 2 or \
+                   abs(y - flag_height // 2) < cross_w_red // 2:
+                    wy = wavy_y(x, y)
+                    if wy is not None and 0 <= wy < flag_height:
+                        flag_surf.set_at((x, wy), (200, 0, 0))
+
+        # Blit du drapeau
+        screen.blit(flag_surf, (int(pole_x + 5), self.y + 30))
 
 class Crow:
     def __init__(self, x, y):
@@ -557,7 +565,7 @@ class GameOverScreen:
                            (corner_x - 2, corner_y + 3),
                            (corner_x + 2, corner_y + 3), 1)
         
-        title_text = "DEFEAT"
+        title_text = "DEFAITE"
         title_y = panel_y + 120
         
         pulse = 0.95 + math.sin(self.title_pulse) * 0.05
@@ -582,7 +590,7 @@ class GameOverScreen:
         
         self.screen.blit(title_surf, title_rect)
         
-        subtitle_text = "The battle is lost..."
+        subtitle_text = "Vous avez été vaincu sur le champ de bataille."
         subtitle_surf = self.font_medium.render(subtitle_text, True, COLORS['shadow'])
         subtitle_rect = subtitle_surf.get_rect(center=(SCREEN_WIDTH // 2, panel_y + 210))
         self.screen.blit(subtitle_surf, subtitle_rect)
@@ -610,7 +618,7 @@ class GameOverScreen:
                            (skull_x + 3, line_y + 4), 2)
         
         quote_y = panel_y + 310
-        quote_text = '"L\'indépendance ne sera pas pour aujourd\'hui, mais elle viendra."'
+        quote_text = "L\'indépendance ne sera pas pour aujourd\'hui."
         quote_surf = self.font_small.render(quote_text, True, COLORS['shadow'])
         quote_rect = quote_surf.get_rect(center=(SCREEN_WIDTH // 2, quote_y))
         self.screen.blit(quote_surf, quote_rect)
@@ -705,7 +713,7 @@ def main():
                 print("Rising again to fight!")
             elif action == "MENU PRINCIPAL":
                 print("Returning to main menu...")
-            elif action == "QUIT":
+            elif action == "QUITTER":
                 print("Farewell, soldier...")
                 running = False
         
