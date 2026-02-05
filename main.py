@@ -10,6 +10,7 @@ import pygame
 from game import Game
 from menu import MainMenu, LevelSelectMenu, PauseMenu
 from menu_game_over import GameOverScreen
+from menu_win import WinScreen
 from shop import Shop
 from player_data import PlayerData
 
@@ -20,6 +21,7 @@ STATE_LEVEL_SELECT = "level_select"
 STATE_SHOP = "shop"
 STATE_PLAYING = "playing"
 STATE_PAUSED = "paused"
+STATE_WIN = "win"
 STATE_GAME_OVER = "game_over"
 
 
@@ -28,7 +30,7 @@ pygame.mixer.init()
 MUSIC_MENU = "assets/Sons/son_accueil.mp3"
 MUSIC_GAME = "assets/Sons/audio_en_jeu.mp3"
 MUSIC_GAMEOVER = "assets/Sons/gameover.mp3"
-
+MUSIC_WIN = "assets/Sons/victoire.mp3"
 
 def main():
     """Configuration principale du jeu."""
@@ -63,6 +65,8 @@ def main():
     pause_menu = PauseMenu(screen)
     
     game_over_screen = GameOverScreen(screen)
+
+    win_screen = WinScreen(screen)
 
     # État actuel
     current_state = STATE_MENU
@@ -159,21 +163,50 @@ def main():
 
             elif current_state == STATE_GAME_OVER:
                 action = game_over_screen.handle_input(event)
-                if action == "RETRY":
+                if action == "REESSAYER":
                     if game:
                         game._restart_game()
                         current_state = STATE_PLAYING
                         pygame.mixer.music.load(MUSIC_GAME)
                         pygame.mixer.music.set_volume(0.8)
                         pygame.mixer.music.play(-1)
-                elif action == "MAIN MENU":
+                elif action == "MENU PRINCIPAL":
                     player_data.save()
                     current_state = STATE_MENU
                     game = None
                     pygame.mixer.music.load(MUSIC_MENU)
                     pygame.mixer.music.set_volume(0.6)
                     pygame.mixer.music.play(-1)
-                elif action == "QUIT":
+                elif action == "QUITTER":
+                    running = False
+
+            elif current_state == STATE_WIN:
+                action = win_screen.handle_input(event)
+                if action == "NIVEAU SUIVANT":
+                    level_index = level_select.selected_level
+                    if level_index + 1 < len(level_select.levels):
+                        level_select.selected_level = level_index + 1
+                        current_level = level_select.get_selected_level()
+                        if current_level and current_level["unlocked"]:
+                            game = Game(screen, current_level, player_data)
+                            current_state = STATE_PLAYING
+                            pygame.mixer.music.load(MUSIC_GAME)
+                            pygame.mixer.music.set_volume(0.8)
+                            pygame.mixer.music.play(-1)
+                    else:
+                        current_state = STATE_MENU
+                        game = None
+                        pygame.mixer.music.load(MUSIC_MENU)
+                        pygame.mixer.music.set_volume(0.6)
+                        pygame.mixer.music.play(-1)
+                elif action == "MENU PRINCIPAL":
+                    player_data.save()
+                    current_state = STATE_MENU
+                    game = None
+                    pygame.mixer.music.load(MUSIC_MENU)
+                    pygame.mixer.music.set_volume(0.6)
+                    pygame.mixer.music.play(-1)
+                elif action == "QUITTER":
                     running = False
 
         # Updates selon l'état
@@ -195,8 +228,19 @@ def main():
                 pygame.mixer.music.load(MUSIC_GAMEOVER)
                 pygame.mixer.music.set_volume(0.8)
                 pygame.mixer.music.play(0)
+            
+            # Vérifier la victoire après l'update
+            if game.victory and current_state == STATE_PLAYING:
+                print("VICTOIRE DETECTEE!")  # DEBUG
+                current_state = STATE_WIN
+                pygame.mixer.music.load(MUSIC_WIN)
+                pygame.mixer.music.set_volume(0.8)
+                pygame.mixer.music.play(0)
+                
         elif current_state == STATE_PAUSED:
             pause_menu.update(dt)
+        elif current_state == STATE_WIN:
+            win_screen.update()
         elif current_state == STATE_GAME_OVER:
             print(f"Dans STATE_GAME_OVER, running={running}")  # DEBUG
             game_over_screen.update()
@@ -218,6 +262,10 @@ def main():
             if game:
                 game.draw()
             game_over_screen.draw()
+        elif current_state == STATE_WIN:
+            if game:
+                game.draw()
+            win_screen.draw()
 
         pygame.display.flip()
 

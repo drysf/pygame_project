@@ -438,7 +438,7 @@ class GameOverScreen:
             for _ in range(5)
         ]
         
-        self.options = ["RETRY", "MAIN MENU", "QUIT"]
+        self.options = ["REESSAYER", "MENU PRINCIPAL", "QUITTER"]
         self.selected = 0
         
         self.title_pulse = 0
@@ -610,16 +610,11 @@ class GameOverScreen:
                            (skull_x + 3, line_y + 4), 2)
         
         quote_y = panel_y + 310
-        quote_text = '"These are the times that try men\'s souls"'
+        quote_text = '"L\'indépendance ne sera pas pour aujourd\'hui, mais elle viendra."'
         quote_surf = self.font_small.render(quote_text, True, COLORS['shadow'])
         quote_rect = quote_surf.get_rect(center=(SCREEN_WIDTH // 2, quote_y))
         self.screen.blit(quote_surf, quote_rect)
-        
-        author_text = "- Thomas Paine"
-        author_surf = self.font_small.render(author_text, True, COLORS['shadow'])
-        author_rect = author_surf.get_rect(center=(SCREEN_WIDTH // 2, quote_y + 40))
-        self.screen.blit(author_surf, author_rect)
-        
+
         for i, option in enumerate(self.options):
             is_selected = (i == self.selected)
             option_y = panel_y + 425 + i * 45  # Changé à 45 pixels d'espacement
@@ -696,7 +691,7 @@ class GameOverScreen:
 
 def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("🎖️ PHILADELPHIA LIBERTY - DEFEAT 🎖️")
+    pygame.display.set_caption("PHILADELPHIA LIBERTY - DEFAITE")
     game_over = GameOverScreen(screen)
     running = True
     
@@ -706,12 +701,12 @@ def main():
                 running = False
             
             action = game_over.handle_input(event)
-            if action == "RETRY":
-                print("⚔️ Rising again to fight!")
-            elif action == "MAIN MENU":
-                print("📜 Returning to main menu...")
+            if action == "REESSAYER":
+                print("Rising again to fight!")
+            elif action == "MENU PRINCIPAL":
+                print("Returning to main menu...")
             elif action == "QUIT":
-                print("🏳️ Farewell, soldier...")
+                print("Farewell, soldier...")
                 running = False
         
         game_over.update()
