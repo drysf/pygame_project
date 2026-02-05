@@ -1091,7 +1091,7 @@ class Pause :
 
 def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("🎖️ 1776 REVOLUTIONARY MENU - ULTRA REALISM 🎖️")
+    pygame.display.set_caption("1776 REVOLUTIONARY MENU")
     menu = HistoricalMenu(screen)
     running = True
     paused = True
@@ -1102,12 +1102,12 @@ def main():
             if paused:
                 action = menu.handle_input(event)
                 if action == "RESUME":
-                    print("⚔️ Returning to the battlefield!")
+                    print("Returning to the battlefield!")
                     paused = False
                 elif action == "RESTART":
-                    print("🔄 Restarting the revolution!")
+                    print("Restarting the revolution!")
                 elif action == "QUIT":
-                    print("🏳️ Honorable retreat!")
+                    print("Honorable retreat!")
                     running = False
             else:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:

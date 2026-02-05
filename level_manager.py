@@ -19,17 +19,17 @@ class LevelManager:
         map_type = level_config.get("map_type", "warehouse")
         
         if map_type == "warehouse":
-            return WarehouseMap(self.screen_width, self.screen_height)
+            return LexingtonCampMap(self.screen_width, self.screen_height)
         elif map_type == "military":
-            return MilitaryBaseMap(self.screen_width, self.screen_height)
+            return FortTiconderogaMap(self.screen_width, self.screen_height)
         elif map_type == "forest":
-            return ForestMap(self.screen_width, self.screen_height)
+            return SaratogaForestMap(self.screen_width, self.screen_height)
         elif map_type == "bunker":
-            return BunkerMap(self.screen_width, self.screen_height)
+            return YorktownBunkerMap(self.screen_width, self.screen_height)
         elif map_type == "headquarters":
-            return HeadquartersMap(self.screen_width, self.screen_height)
+            return WashingtonHQMap(self.screen_width, self.screen_height)
         else:
-            return WarehouseMap(self.screen_width, self.screen_height)
+            return LexingtonCampMap(self.screen_width, self.screen_height)
 
 
 class BaseMap:
@@ -84,8 +84,8 @@ class BaseMap:
             print(f"[ERREUR] Erreur chargement sol {level_number}: {e}")
 
 
-class WarehouseMap(BaseMap):
-    """Carte: Entrepôt - Zone d'entraînement"""
+class LexingtonCampMap(BaseMap):
+    """Carte: Camp de Lexington - Zone d'entraînement"""
     
     def __init__(self, screen_width, screen_height):
         super().__init__(screen_width, screen_height)
@@ -122,8 +122,8 @@ class WarehouseMap(BaseMap):
                 print(f"✗ Erreur baril: {e}")
 
 
-class MilitaryBaseMap(BaseMap):
-    """Carte: Base Militaire"""
+class FortTiconderogaMap(BaseMap):
+    """Carte: Fort Ticonderoga - Base Militaire"""
     
     def __init__(self, screen_width, screen_height):
         super().__init__(screen_width, screen_height)
@@ -154,8 +154,8 @@ class MilitaryBaseMap(BaseMap):
         self.walls.add(Wall(2 * room_w, room_h // 2, wall_thickness, room_h, sprite_type="c_vertical"))
 
 
-class ForestMap(BaseMap):
-    """Carte: Forêt - Extérieur"""
+class SaratogaForestMap(BaseMap):
+    """Carte: Forêt de Saratoga - Extérieur"""
     
     def __init__(self, screen_width, screen_height):
         super().__init__(screen_width, screen_height)
@@ -221,8 +221,8 @@ class ForestMap(BaseMap):
             self.decorations.add(puddle)
 
 
-class BunkerMap(BaseMap):
-    """Carte: Bunker - Espace confiné"""
+class YorktownBunkerMap(BaseMap):
+    """Carte: Bunker de Yorktown - Espace confiné"""
     
     def __init__(self, screen_width, screen_height):
         super().__init__(screen_width, screen_height)
@@ -279,8 +279,8 @@ class BunkerMap(BaseMap):
         return (self.map_width - 200, self.map_height - 150)
 
 
-class HeadquartersMap(BaseMap):
-    """Carte: QG Ennemi - Mission finale"""
+class WashingtonHQMap(BaseMap):
+    """Carte: QG de Washington - Mission finale"""
     
     def __init__(self, screen_width, screen_height):
         super().__init__(screen_width, screen_height)
