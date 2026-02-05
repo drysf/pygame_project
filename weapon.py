@@ -1,7 +1,4 @@
-"""
-Définition desarmes du jeu
-"""
-
+"""Armes du jeu"""
 
 class Weapon:
     """Définition d'une arme"""
@@ -17,7 +14,6 @@ class Weapon:
         self.bullet_count = bullet_count
         self.spread = spread
         self.auto_fire = auto_fire
-
 
 # Définition de toutes les armes disponibles dans le jeu
 ALL_WEAPONS = {
@@ -112,7 +108,6 @@ ALL_WEAPONS = {
         "auto_fire": False
     }
 }
-
 
 class WeaponManager:
     """Gestionnaire des armes"""

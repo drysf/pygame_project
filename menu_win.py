@@ -1,3 +1,4 @@
+"""Menu en cas de victoire"""
 import pygame
 import sys
 import math
@@ -39,7 +40,6 @@ COLORS = {
     'shadow': (30, 30, 35),
 }
 
-
 class Confetti:
     def __init__(self):
         self.reset()
@@ -78,7 +78,6 @@ class Confetti:
             points.append((int(px), int(py)))
         pygame.draw.polygon(screen, self.color, points)
 
-
 class RisingLight:
     def __init__(self):
         self.particles = [
@@ -105,7 +104,6 @@ class RisingLight:
             surf = pygame.Surface((4, 8), pygame.SRCALPHA)
             pygame.draw.ellipse(surf, (*COLORS['warm_gold'], alpha), (0, 0, 4, 8))
             screen.blit(surf, (int(x), int(y)))
-
 
 class StandingSoldier:
     def __init__(self, x, y, facing_right=True):
@@ -168,7 +166,6 @@ class StandingSoldier:
             screen, COLORS['shadow'], (int(leg_x), int(leg_y)), (int(leg_x), int(leg_y + 20)), 4
         )
 
-
 class ProudFlag:
     def __init__(self, x, y):
         self.x = x
@@ -227,7 +224,6 @@ class ProudFlag:
                             flag_surf.set_at((px, py + wave), COLORS['ivory'])
 
         screen.blit(flag_surf, (int(pole_x + 6), self.y + 25))
-
 
 class WinScreen:
     def __init__(self, screen):
@@ -493,10 +489,9 @@ class WinScreen:
 
         return None
 
-
 def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("PHILADELPHIA LIBERTY - VICTOIRE")
+    pygame.display.set_caption("PHILADELPHIA LIBERTY VICTOIRE")
     win_screen = WinScreen(screen)
     running = True
     clock = pygame.time.Clock()
@@ -522,7 +517,6 @@ def main():
 
     pygame.quit()
     sys.exit()
-
 
 if __name__ == "__main__":
     main()

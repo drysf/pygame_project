@@ -1,25 +1,20 @@
-"""
-Classe représentant le joueur
-"""
+"""Paramètres du joueur"""
 import pygame
 import math
 import random
 from animation import PlayerAnimations
 from weapon import WeaponManager
 
-
-# Son de tir (sera chargé à la première utilisation)
+# Son de tir
 GUNSHOT_SOUND = None
 
-
 def get_gunshot_sound():
-    """Charge le son de tir si ce n'est pas déjà fait"""
+    """Charge le son de tir"""
     global GUNSHOT_SOUND
     if GUNSHOT_SOUND is None:
         GUNSHOT_SOUND = pygame.mixer.Sound("assets/Sons/gunshot.mp3")
         GUNSHOT_SOUND.set_volume(0.8)
     return GUNSHOT_SOUND
-
 
 class Player(pygame.sprite.Sprite):
     """Joueur contrôlé par l'utilisateur"""

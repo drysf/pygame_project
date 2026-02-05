@@ -1,14 +1,11 @@
-"""
-Gestionnaire de niveaux - Génère différentes cartes
-"""
+"""Gestionnaire de niveaux"""
 import pygame
 import random
 import os
 from room import Wall, Tree, Bush, GrassPatch, Rock, Flower, WaterPuddle
 
-
 class LevelManager:
-    """Gestionnaire des différents niveaux"""
+    """Gestion des différents niveaux"""
     
     def __init__(self, screen_width, screen_height):
         self.screen_width = screen_width
@@ -30,7 +27,6 @@ class LevelManager:
             return WashingtonHQMap(self.screen_width, self.screen_height)
         else:
             return LexingtonCampMap(self.screen_width, self.screen_height)
-
 
 class BaseMap:
     """Classe de base pour les cartes"""
@@ -83,9 +79,8 @@ class BaseMap:
         except Exception as e:
             print(f"[ERREUR] Erreur chargement sol {level_number}: {e}")
 
-
 class LexingtonCampMap(BaseMap):
-    """Carte: Camp de Lexington - Zone d'entraînement"""
+    """Carte: Camp de Lexington zone d'entraînement"""
     
     def __init__(self, screen_width, screen_height):
         super().__init__(screen_width, screen_height)
@@ -100,7 +95,7 @@ class LexingtonCampMap(BaseMap):
         self._create_obstacles()
     
     def _create_obstacles(self):
-        """Crée les obstacles de l'entrepôt (barils)"""
+        """Crée les obstacles de l'entrepôt"""
         crate_positions = [
             (200, 200, 80, 80),
             (400, 150, 60, 60),
@@ -120,7 +115,6 @@ class LexingtonCampMap(BaseMap):
                 print(f"✓ Baril créé en ({x}, {y})")
             except Exception as e:
                 print(f"✗ Erreur baril: {e}")
-
 
 class FortTiconderogaMap(BaseMap):
     """Carte: Fort Ticonderoga - Base Militaire"""
@@ -153,9 +147,8 @@ class FortTiconderogaMap(BaseMap):
         # Mur vertical droit
         self.walls.add(Wall(2 * room_w, room_h // 2, wall_thickness, room_h, sprite_type="c_vertical"))
 
-
 class SaratogaForestMap(BaseMap):
-    """Carte: Forêt de Saratoga - Extérieur"""
+    """Carte: Forêt de Saratoga"""
     
     def __init__(self, screen_width, screen_height):
         super().__init__(screen_width, screen_height)
@@ -172,7 +165,7 @@ class SaratogaForestMap(BaseMap):
         self.exterior_zones = []  
     
     def _create_forest(self):
-        """Crée la forêt avec arbres et végétation"""
+        """Crée la forêt avec arbres et décors"""
         # Arbres (bloquent le passage)
         for _ in range(60):
             x = random.randint(100, self.map_width - 100)
@@ -220,9 +213,8 @@ class SaratogaForestMap(BaseMap):
             puddle = WaterPuddle(x, y, random.randint(60, 100), random.randint(30, 50))
             self.decorations.add(puddle)
 
-
 class YorktownBunkerMap(BaseMap):
-    """Carte: Bunker de Yorktown - Espace confiné"""
+    """Carte: Bunker de Yorktown"""
     
     def __init__(self, screen_width, screen_height):
         super().__init__(screen_width, screen_height)
@@ -280,7 +272,7 @@ class YorktownBunkerMap(BaseMap):
 
 
 class WashingtonHQMap(BaseMap):
-    """Carte: QG de Washington - Mission finale"""
+    """Carte: QG de Washington"""
     
     def __init__(self, screen_width, screen_height):
         super().__init__(screen_width, screen_height)

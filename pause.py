@@ -1,3 +1,4 @@
+"""Menu pause"""
 import pygame
 import sys
 import math
@@ -49,7 +50,6 @@ COLORS = {
     'stone_gray': (169, 169, 169),
 }
 
-
 class Cloud:
     def __init__(self, x, y, scale=1.0, speed=0.2):
         self.x = x
@@ -81,7 +81,6 @@ class Cloud:
                              (int(radius * 1.25), int(radius * 1.25)), int(radius))
             screen.blit(cloud_surf, (int(self.x + offset_x - radius * 1.25), 
                                      int(self.y + offset_y - radius * 1.25)))
-
 
 class Bird:
     def __init__(self, x, y):
@@ -115,7 +114,6 @@ class Bird:
         )
         pygame.draw.line(screen, COLORS['shadow'], (int(self.x), int(self.y)), left_wing, 2)
         pygame.draw.line(screen, COLORS['shadow'], (int(self.x), int(self.y)), right_wing, 2)
-
 
 class MuzzleFlash:
     def __init__(self, x, y, angle):
@@ -159,7 +157,6 @@ class MuzzleFlash:
                                      (int(seg_x), int(seg_y)), seg_size)
             screen.blit(flash_surf, (int(self.x - self.size * 1.5), int(self.y - self.size * 1.5)))
 
-
 class SmokeParticle:
     def __init__(self, x, y, vx, vy):
         self.x = x
@@ -196,7 +193,6 @@ class SmokeParticle:
                                  int(self.size * (1 + i * 0.2)))
             screen.blit(smoke_surf, (int(self.x - self.size * 1.5), int(self.y - self.size * 1.5)))
 
-
 class DetailedWindow:
     @staticmethod
     def draw(screen, x, y, width, height, has_light=False):
@@ -220,7 +216,6 @@ class DetailedWindow:
                         (x + 1, y + height // 2 + 1), (x + width + 1, y + height // 2 + 1), 1)
         pygame.draw.line(screen, COLORS['shadow'], 
                         (x + width // 2 + 1, y + 1), (x + width // 2 + 1, y + height + 1), 1)
-
 
 class ColonialHouse:
     def __init__(self, x, y, house_type=0, scale=1.0):
@@ -562,7 +557,6 @@ class ColonialHouse:
         for nail_y in range(int(door_y + 5 * self.scale), int(door_y + door_height), int(8 * self.scale)):
             for nail_x in [door_x + 5 * self.scale, door_x + door_width - 5 * self.scale]:
                 pygame.draw.circle(screen, (50, 50, 50), (int(nail_x), int(nail_y)), 2)
-
 
 class DetailedSoldier:
     def __init__(self, x, y, scale=1.0, facing_right=True, uniform_color='blue', rank='soldier'):
@@ -940,9 +934,9 @@ class Pause :
         for flash in self.muzzle_flashes:
             flash.draw(self.screen)
 
-        # === PANNEAU DE MENU ===
+        # Panneau de menu
         panel_y = 10
-        panel_height = 500  # *** AGRANDI de 420 -> 500 pour loger les options espacées ***
+        panel_height = 500
 
         overlay = pygame.Surface((SCREEN_WIDTH - 40, panel_height), pygame.SRCALPHA)
         overlay.fill((*COLORS['parchment'], 245))
@@ -971,8 +965,8 @@ class Pause :
             pygame.draw.polygon(self.screen, COLORS['warm_gold'], star_points)
             pygame.draw.polygon(self.screen, COLORS['brass'], star_points, 2)
 
-        # === TITRE "PAUSED" ===
-        title_text = "⚔ PAUSED ⚔"
+        # Titre en pause
+        title_text = "PAUSED"
         for offset in range(8, 0, -1):
             shadow_alpha = 50 - offset * 5
             shadow_surf = self.font_title.render(title_text, True, COLORS['shadow'])
@@ -990,27 +984,10 @@ class Pause :
             self.screen.blit(outline_surf, (title_rect.x + offset_x, title_rect.y + offset_y))
         self.screen.blit(title_surf, title_rect)
 
-        # Ligne décorative ornementale
-        line_y = 175
-        line_center = SCREEN_WIDTH // 2
-        pygame.draw.line(self.screen, COLORS['warm_gold'],
-                        (line_center - 350, line_y),
-                        (line_center + 350, line_y), 4)
-        for ornament_x in [line_center - 300, line_center, line_center + 300]:
-            pygame.draw.circle(self.screen, COLORS['warm_gold'], (ornament_x, line_y), 8)
-            pygame.draw.circle(self.screen, COLORS['deep_red'], (ornament_x, line_y), 5)
-        for direction, x_pos in [(-1, line_center - 370), (1, line_center + 370)]:
-            arrow_points = [
-                (x_pos, line_y),
-                (x_pos + direction * 15, line_y - 8),
-                (x_pos + direction * 15, line_y + 8)
-            ]
-            pygame.draw.polygon(self.screen, COLORS['warm_gold'], arrow_points)
-
-        # === OPTIONS DU MENU — espacées de 70px au lieu de 42px ===
+        #Options du menu
         for i, option in enumerate(self.options):
             is_selected = (i == self.selected)
-            option_y = 240 + i * 70  # *** ESPACE AUGMENTÉ : 42 -> 70 ***
+            option_y = 240 + i * 70
 
             if is_selected:
                 sel_width = 450
@@ -1087,7 +1064,6 @@ class Pause :
             elif event.key == pygame.K_ESCAPE:
                 return "RESUME"
         return None
-
 
 def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))

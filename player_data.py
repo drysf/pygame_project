@@ -1,6 +1,4 @@
-"""
-Données persistantes du joueur (or, armes, progression)
-"""
+"""Données du joueur (or, armes, progression)"""
 import json
 import os
 
@@ -23,11 +21,11 @@ class PlayerData:
         self.load()
     
     def add_gold(self, amount):
-        """Ajoute de l'or"""
+        """Ajoute de la monnaie"""
         self.gold += amount
     
     def spend_gold(self, amount):
-        """Dépense de l'or si possible"""
+        """Dépense de la monnaie si possible"""
         if self.gold >= amount:
             self.gold -= amount
             return True

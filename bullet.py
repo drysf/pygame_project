@@ -1,6 +1,4 @@
-"""
-Classe représentant les projectiles
-"""
+"""Paramètres des projectiles"""
 import pygame
 import math
 import os
@@ -8,7 +6,7 @@ import os
 
 
 class Bullet(pygame.sprite.Sprite):
-    """Projectile tiré par le joueur ou les ennemis"""
+    """Projectiles joueur et ennemis"""
     
     def __init__(self, x, y, dx, dy, color, is_player=True, damage=None, speed=None, image=None):
         super().__init__()

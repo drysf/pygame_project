@@ -1,6 +1,4 @@
-"""
-Animations du joueur
-"""
+"""Animations du joueur"""
 import pygame
 import os
 

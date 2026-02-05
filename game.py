@@ -1,6 +1,4 @@
-"""
-Classe principale du jeu gérant tous les éléments
-"""
+"""Gestion des éléments du jeu"""
 import pygame
 import random
 import math
@@ -9,7 +7,6 @@ from enemy import Enemy, EliteEnemy
 from bullet import Bullet
 from camera import Camera
 from level_manager import LevelManager
-
 
 class HealthPack(pygame.sprite.Sprite):
     """Power-up qui redonne de la vie"""
@@ -27,7 +24,7 @@ class HealthPack(pygame.sprite.Sprite):
         self._draw_pack()
     
     def _draw_pack(self):
-        """Dessine le power-up (croix de vie)"""
+        """Dessine le power-up"""
         self.image.fill((0, 0, 0, 0))
         center = (15, 15)
         
@@ -50,7 +47,6 @@ class HealthPack(pygame.sprite.Sprite):
         """Met à jour l'animation"""
         self.pulse_timer += dt * 5
         self._draw_pack()
-
 
 class Game:
     """Gestionnaire principal du jeu"""
@@ -338,7 +334,7 @@ class Game:
         hud_bg.fill((0, 0, 0))
         self.screen.blit(hud_bg, (5, 5))
 
-        level_name = self.        level_name = self.level_config.get("name", "Mission")
+        level_name = self.level_config.get("name", "Mission")
         level_text = self.small_font.render(level_name, True, (255, 215, 0))
         self.screen.blit(level_text, (10, 10))
 

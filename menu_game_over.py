@@ -1,3 +1,4 @@
+"""Menu Game over"""
 import pygame
 import sys
 import math
@@ -52,7 +53,6 @@ COLORS = {
     'gunpowder': (70, 70, 70),
 }
 
-
 class RainDrop:
     def __init__(self):
         self.x = random.randint(0, SCREEN_WIDTH)
@@ -70,7 +70,6 @@ class RainDrop:
         pygame.draw.line(screen, (*COLORS['cloud_dark'], 120),
                         (int(self.x), int(self.y)),
                         (int(self.x - 2), int(self.y + self.length)), 2)
-
 
 class Ember:
     def __init__(self, x, y):
@@ -104,7 +103,6 @@ class Ember:
                              (int(self.x), int(self.y)), self.size)
             pygame.draw.circle(screen, (*COLORS['white'], int(alpha * 0.5 * flicker)),
                              (int(self.x), int(self.y)), max(1, self.size // 2))
-
 
 class Smoke:
     def __init__(self, x, y):
@@ -141,7 +139,6 @@ class Smoke:
                                  int(self.size * (1 + i * 0.2)))
             
             screen.blit(smoke_surf, (int(self.x - self.size * 1.5), int(self.y - self.size * 1.5)))
-
 
 class BattlefieldFire:
     def __init__(self, x, y, scale=1.0):
@@ -214,7 +211,6 @@ class BattlefieldFire:
         for ember in self.embers:
             ember.draw(screen)
 
-
 class FallenSoldier:
     def __init__(self, x, y, facing_right=True):
         self.x = x
@@ -275,7 +271,6 @@ class FallenSoldier:
         pygame.draw.line(screen, COLORS['gunpowder'],
                         (int(musket_x), int(musket_y)),
                         (int(musket_end_x), int(musket_end_y)), 4)
-
 
 class TatteredFlag:
     def __init__(self, x, y):
@@ -408,7 +403,6 @@ class Crow:
             
             pygame.draw.line(screen, (0, 0, 0), (int(self.x), int(self.y)), left_wing, 2)
             pygame.draw.line(screen, (0, 0, 0), (int(self.x), int(self.y)), right_wing, 2)
-
 
 class GameOverScreen:
     def __init__(self, screen):
@@ -699,7 +693,7 @@ class GameOverScreen:
 
 def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("PHILADELPHIA LIBERTY - DEFAITE")
+    pygame.display.set_caption("PHILADELPHIA LIBERTY DEFAITE")
     game_over = GameOverScreen(screen)
     running = True
     
@@ -725,7 +719,6 @@ def main():
     
     pygame.quit()
     sys.exit()
-
 
 if __name__ == "__main__":
     main()

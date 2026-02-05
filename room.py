@@ -1,6 +1,4 @@
-"""
-Classe représentant une salle avec des murs
-"""
+"""Salles et éléments de décor"""
 import os
 import pygame
 import random
@@ -75,10 +73,10 @@ class Wall(pygame.sprite.Sprite):
         return surf
 
 class Tree(pygame.sprite.Sprite):
-    """Arbre décoratif (collision) basé sur un asset"""
+    """Arbre avec collision basé sur un asset"""
     def __init__(self, x, y, size=50):
         super().__init__()
-        # Par exemple on fixe la hauteur à size et on garde le ratio
+        # On fixe la hauteur à size et on garde le ratio
         img = load_random_image("Arbres")  # assets/Environnement/Arbres
         w, h = img.get_size()
         new_h = size
@@ -86,9 +84,8 @@ class Tree(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(img, (new_w, new_h))
         self.rect = self.image.get_rect(center=(x, y))
 
-
 class Bush(pygame.sprite.Sprite):
-    """Buisson décoratif (pas de collision) basé sur un asset"""
+    """Buisson sans de collision basé sur un asset"""
     def __init__(self, x, y, size=30):
         super().__init__()
         img = load_random_image("Bush")
@@ -99,7 +96,7 @@ class Bush(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(x, y))
 
 class GrassPatch(pygame.sprite.Sprite):
-    """Touffe d'herbe décorative basée sur un asset"""
+    """Herbe basée sur un asset"""
     def __init__(self, x, y, size=20):
         super().__init__()
         img = load_random_image("Herbe")
@@ -110,7 +107,7 @@ class GrassPatch(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(x, y))
 
 class Rock(pygame.sprite.Sprite):
-    """Rocher décoratif (collision)"""
+    """Rocher décoratif avec collision"""
     
     def __init__(self, x, y, size=35):
         super().__init__()
@@ -133,9 +130,8 @@ class Rock(pygame.sprite.Sprite):
         
         self.rect = self.image.get_rect(center=(x, y))
 
-
 class Flower(pygame.sprite.Sprite):
-    """Fleur décorative basée sur un asset"""
+    """Fleur basée sur un asset"""
     def __init__(self, x, y, size=15):
         super().__init__()
         img = load_random_image("Fleurs")
@@ -146,7 +142,7 @@ class Flower(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(x, y))
 
 class WaterPuddle(pygame.sprite.Sprite):
-    """Flaque d'eau décorative"""
+    """Flaque d'eau"""
     
     def __init__(self, x, y, width=60, height=30):
         super().__init__()
@@ -156,7 +152,6 @@ class WaterPuddle(pygame.sprite.Sprite):
         pygame.draw.ellipse(self.image, (100, 180, 230, 100), (width // 4, height // 4, width // 2, height // 2))
         
         self.rect = self.image.get_rect(center=(x, y))
-
 
 class Room:
     """Grande carte avec plusieurs salles connectées"""
@@ -215,7 +210,7 @@ class Room:
         self._add_obstacles()
     
     def _add_obstacles(self):
-        """Ajoute des obstacles variés dans les salles (murs gris)"""
+        """Ajoute des obstacles variés dans les salles"""
         room_width = self.screen_width
         room_height = self.screen_height
         
@@ -245,13 +240,12 @@ class Room:
             (room_width + 200, 2 * room_height + 150, 25, 250),
             (2 * room_width + room_width // 2 - 100, 2 * room_height + room_height // 2 - 100, 200, 25),
             (3 * room_width + 100, 2 * room_height + 100, 60, 60),
-        ]
-        
+        ]       
         for x, y, w, h in obstacles:
             self.walls.add(Wall(x, y, w, h))
     
 def _add_sprite_decorations(self):
-    """Ajoute des sprites réels dans les salles"""
+    """Ajoute des sprites dans les salles"""
     room_width = self.screen_width
     room_height = self.screen_height
     

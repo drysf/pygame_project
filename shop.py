@@ -1,6 +1,4 @@
-"""
-Système de boutique d'armes - US Army Armory
-"""
+"""Système de boutique d'armes"""
 import pygame
 from menu import Button
 
@@ -20,7 +18,7 @@ class ShopItem:
 
 
 class Shop:
-    """Boutique d'armes - US Army Armory"""
+    """Boutique d'armes"""
     
     def __init__(self, screen):
         self.screen = screen
@@ -177,7 +175,7 @@ class Shop:
             return None
     
     def draw(self):
-        """Dessine la boutique - Style US Army"""
+        """Dessine la boutique"""
         # Fond avec dégradé militaire
         for y in range(self.screen_height):
             ratio = y / self.screen_height
@@ -195,12 +193,12 @@ class Shop:
             self._draw_star(x, 45, 12, (255, 255, 255))
         
         # Titre
-        title = self.title_font.render("US ARMY ARMORY", True, (255, 215, 0))
+        title = self.title_font.render("Armurerie du bataillon", True, (255, 215, 0))
         title_rect = title.get_rect(center=(self.screen_width // 2, 45))
         self.screen.blit(title, title_rect)
         
         # Sous-titre
-        subtitle = self.small_font.render("Gear up, soldier!", True, (200, 200, 200))
+        subtitle = self.small_font.render("Aux armes, soldat !", True, (200, 200, 200))
         subtitle_rect = subtitle.get_rect(center=(self.screen_width // 2, 75))
         self.screen.blit(subtitle, subtitle_rect)
         
@@ -276,11 +274,11 @@ class Shop:
             pygame.draw.polygon(self.screen, color, points)
     
     def _draw_item(self, item, x, y, width, height):
-        """Dessine un article - Style militaire"""
+        """Dessine un article"""
         # Icône d'arme
         icon_rect = pygame.Rect(x + 15, y + 15, 70, 70)
         if item.owned:
-            icon_color = (34, 85, 34)  # Vert militaire
+            icon_color = (34, 85, 34)
             border_color = (100, 200, 100)
         else:
             icon_color = (60, 60, 80)

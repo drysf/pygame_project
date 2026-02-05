@@ -1,8 +1,5 @@
-"""
-Classe représentant la caméra qui suit le joueur
-"""
+"""Paramètres de la caméra"""
 import pygame
-
 
 class Camera:
     """Caméra qui suit le joueur sur la carte"""
@@ -18,7 +15,7 @@ class Camera:
         self.y = 0
     
     def update(self, target):
-        """Mise à jour de la position de la caméra pour suivre la cible"""
+        """Mise à jour de la position de la caméra"""
         # Centrer la caméra sur la cible
         self.x = target.pos.x - self.screen_width // 2
         self.y = target.pos.y - self.screen_height // 2

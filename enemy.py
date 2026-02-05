@@ -1,6 +1,4 @@
-"""
-Classe représentant les ennemis
-"""
+"""Paramètres des ennemis"""
 import pygame
 import math
 import random
@@ -25,7 +23,7 @@ class Enemy(pygame.sprite.Sprite):
                 # Retourner l'image (elle était à l'envers)
                 cls._soldier_image = pygame.transform.flip(scaled, False, True)
             except Exception as e:
-                print(f"[ERREUR] Chargement soldier.png: {e}")
+                print(f"Erreur de chargement soldier.png: {e}")
                 # Fallback: carré rouge
                 cls._soldier_image = pygame.Surface((130, 130), pygame.SRCALPHA)
                 cls._soldier_image.fill((200, 50, 50))
@@ -163,7 +161,6 @@ class Enemy(pygame.sprite.Sprite):
         
         # Dessiner le contour
         pygame.draw.rect(screen, (255, 255, 255), background_rect, 1)
-
 
 class EliteEnemy(Enemy):
     """Ennemi d'élite - Plus puissant, apparence noir et rouge"""

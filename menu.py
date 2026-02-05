@@ -1,7 +1,4 @@
-"""
-Menu principal du jeu - Philadelphia Liberty
-Style colonial américain avec animations détaillées
-"""
+"""Menu principal du jeu"""
 import pygame
 import sys
 import math
@@ -13,7 +10,7 @@ SCREEN_WIDTH = 1024
 SCREEN_HEIGHT = 768
 FPS = 60
 
-# Palette ultra-réaliste
+# Palette ce couleurs
 COLORS = {
     'sky_top': (100, 149, 237),
     'sky_middle': (135, 206, 250),
@@ -50,7 +47,6 @@ COLORS = {
     'stone_gray': (169, 169, 169),
 }
 
-
 class Cloud:
     def __init__(self, x, y, scale=1.0, speed=0.2):
         self.x = x
@@ -82,7 +78,6 @@ class Cloud:
                              (int(radius * 1.25), int(radius * 1.25)), int(radius))
             screen.blit(cloud_surf, (int(self.x + offset_x - radius * 1.25), 
                                      int(self.y + offset_y - radius * 1.25)))
-
 
 class Bird:
     def __init__(self, x, y):
@@ -116,7 +111,6 @@ class Bird:
         )
         pygame.draw.line(screen, COLORS['shadow'], (int(self.x), int(self.y)), left_wing, 2)
         pygame.draw.line(screen, COLORS['shadow'], (int(self.x), int(self.y)), right_wing, 2)
-
 
 class MuzzleFlash:
     def __init__(self, x, y, angle):
@@ -160,7 +154,6 @@ class MuzzleFlash:
                                      (int(seg_x), int(seg_y)), seg_size)
             screen.blit(flash_surf, (int(self.x - self.size * 1.5), int(self.y - self.size * 1.5)))
 
-
 class SmokeParticle:
     def __init__(self, x, y, vx, vy):
         self.x = x
@@ -197,7 +190,6 @@ class SmokeParticle:
                                  int(self.size * (1 + i * 0.2)))
             screen.blit(smoke_surf, (int(self.x - self.size * 1.5), int(self.y - self.size * 1.5)))
 
-
 class DetailedWindow:
     @staticmethod
     def draw(screen, x, y, width, height, has_light=False):
@@ -221,7 +213,6 @@ class DetailedWindow:
                         (x + 1, y + height // 2 + 1), (x + width + 1, y + height // 2 + 1), 1)
         pygame.draw.line(screen, COLORS['shadow'], 
                         (x + width // 2 + 1, y + 1), (x + width // 2 + 1, y + height + 1), 1)
-
 
 class ColonialHouse:
     def __init__(self, x, y, house_type=0, scale=1.0):
@@ -564,7 +555,6 @@ class ColonialHouse:
             for nail_x in [door_x + 5 * self.scale, door_x + door_width - 5 * self.scale]:
                 pygame.draw.circle(screen, (50, 50, 50), (int(nail_x), int(nail_y)), 2)
 
-
 class DetailedSoldier:
     def __init__(self, x, y, scale=1.0, facing_right=True, uniform_color='blue', rank='soldier'):
         self.x = x
@@ -783,7 +773,6 @@ class DetailedSoldier:
                         (int(head_x - 3 * self.scale), int(head_y + 5 * self.scale)),
                         (int(head_x + 3 * self.scale), int(head_y + 5 * self.scale)), 1)
 
-
 class Button:
     """Bouton interactif pour le menu"""
     
@@ -820,9 +809,8 @@ class Button:
             return self.is_hovered
         return False
 
-
 class MainMenu:
-    """Menu principal colonial du jeu"""
+    """Menu principal"""
     
     def __init__(self, screen):
         self.screen = screen
@@ -1021,7 +1009,7 @@ class MainMenu:
         for flash in self.muzzle_flashes:
             flash.draw(self.screen)
 
-        # === PANNEAU DE TITRE ===
+        # Panneau de titre
         panel_y = 15
         panel_height = 180
         
@@ -1052,7 +1040,7 @@ class MainMenu:
             pygame.draw.polygon(self.screen, COLORS['warm_gold'], star_points)
             pygame.draw.polygon(self.screen, COLORS['brass'], star_points, 2)
 
-        # === TITRE PRINCIPAL ===
+        # Titre principal
         title_text = "PHILADELPHIA LIBERTY"
         title_y = panel_y + 50
         
@@ -1076,7 +1064,7 @@ class MainMenu:
             self.screen.blit(outline_surf, (title_rect.x + offset_x, title_rect.y + offset_y))
         self.screen.blit(title_surf, title_rect)
 
-        # === SOUS-TITRE ===
+        # Sous-titre
         subtitle_text = "250ème Anniversaire de l'Indépendance"
         subtitle_y = panel_y + 105
         
@@ -1098,7 +1086,7 @@ class MainMenu:
             pygame.draw.circle(self.screen, COLORS['warm_gold'], (ornament_x, line_y), 8)
             pygame.draw.circle(self.screen, COLORS['deep_red'], (ornament_x, line_y), 5)
 
-        # === PANNEAU DE MENU (OPTIONS) ===
+        # Options 
         menu_panel_y = 210
         menu_panel_height = 380
         
@@ -1129,7 +1117,7 @@ class MainMenu:
             pygame.draw.polygon(self.screen, COLORS['warm_gold'], star_points)
             pygame.draw.polygon(self.screen, COLORS['brass'], star_points, 2)
 
-        # === OPTIONS DU MENU ===
+        # Options du menu
         for i, option in enumerate(self.options):
             is_selected = (i == self.selected)
             option_y = menu_panel_y + 55 + i * 62
@@ -1203,7 +1191,7 @@ class MainMenu:
             self._draw_gold_display()
     
     def _draw_gold_display(self):
-        """Affiche l'or du joueur"""
+        """Affiche la monnaie en joueur"""
         gold_bg = pygame.Rect(self.screen_width - 180, 15, 160, 45)
         pygame.draw.rect(self.screen, (20, 40, 20, 200), gold_bg, border_radius=8)
         pygame.draw.rect(self.screen, COLORS['warm_gold'], gold_bg, 2, border_radius=8)
@@ -1245,8 +1233,7 @@ class MainMenu:
                 option_y = menu_panel_y + 55 + i * 62
                 option_rect = pygame.Rect(self.screen_width // 2 - 210, option_y - 25, 420, 50)
                 if option_rect.collidepoint(mouse_pos):
-                    self.selected = i
-        
+                    self.selected = i   
         return None
     
     def get_action(self):
@@ -1287,7 +1274,6 @@ class LevelSelectMenu:
             "enemies": 40, "unlocked": False, "required_gold": 2000, "map_type": "headquarters"},
 ]
 
-        
         self.level_buttons = []
         self._create_level_buttons()
         
@@ -1362,8 +1348,7 @@ class LevelSelectMenu:
                         self.player_data.gold -= level["required_gold"]
                         self.player_data.unlocked_levels.add(index)
                         level["unlocked"] = True
-                        return "unlocked"
-        
+                        return "unlocked" 
         return None
     
     def draw(self):
@@ -1443,7 +1428,7 @@ class LevelSelectMenu:
 
 
 class PauseMenu:
-    """Menu de pause - Style Colonial"""
+    """Menu de pause"""
     
     def __init__(self, screen):
         self.screen = screen
@@ -1495,7 +1480,6 @@ class PauseMenu:
                 option_rect = pygame.Rect(self.screen_width // 2 - 180, option_y - 25, 360, 50)
                 if option_rect.collidepoint(mouse_pos):
                     self.selected = i
-        
         return None
     
     def _get_action(self):
@@ -1510,7 +1494,7 @@ class PauseMenu:
         return None
     
     def draw(self):
-        """Dessine le menu de pause - Style Colonial"""
+        """Dessine le menu de pause"""
         # Overlay semi-transparent
         overlay = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 180))
