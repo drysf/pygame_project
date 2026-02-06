@@ -1,5 +1,13 @@
+# Fichiers de sauvegarde
 save_data.json
+
+# Fichiers Mac OS
+.DS_Store
+._*
+
+# Assets exclus
 /assets/pixel_village/Entities
-*.json
-save_data.json
-save_data.json
+
+# Cache Python
+__pycache__/
+*.pyc

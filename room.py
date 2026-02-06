@@ -15,7 +15,7 @@ def load_random_image(subfolder, scale=None):
     folder_path = os.path.join(ASSETS_ENV_PATH, subfolder)
     files = [
         f for f in os.listdir(folder_path)
-        if f.lower().endswith((".png", ".jpg", ".jpeg"))
+        if f.lower().endswith((".png", ".jpg", ".jpeg")) and not f.startswith("._")
     ]
     if not files:
         raise FileNotFoundError(f"Aucun asset dans {folder_path}")
