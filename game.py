@@ -8,6 +8,18 @@ from bullet import Bullet
 from camera import Camera
 from level_manager import LevelManager
 
+POWERUP_SOUND = None
+
+def get_powerup_sound():
+    """Charge le son de power-up si ce n'est pas déjà fait"""
+    global POWERUP_SOUND
+    if POWERUP_SOUND is None:
+        try:
+            POWERUP_SOUND = pygame.mixer.Sound("assets/Sons/powerup.mp3")
+            POWERUP_SOUND.set_volume(10.0)  
+        except Exception as e:
+            print(f"Erreur chargement son power-up: {e}")
+    return POWERUP_SOUND
 class HealthPack(pygame.sprite.Sprite):
     """Power-up qui redonne de la vie"""
     
@@ -244,6 +256,10 @@ class Game:
         healed = self.player.health - old_health
         
         if healed > 0:
+            sound = get_powerup_sound()
+        if sound:
+            sound.play()
+        
             screen_pos = self.camera.apply_pos((self.player.pos.x, self.player.pos.y - 30))
             self.heal_notifications.append({
                 'text': f'+{healed} HP',
