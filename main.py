@@ -282,5 +282,6 @@ def main():
     pygame.quit()
     sys.exit()
 
+# TEST
 if __name__ == "__main__":
     main()
